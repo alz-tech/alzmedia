@@ -1,0 +1,31 @@
+{
+  "name": "alzmedia",
+  "version": "1.0.0",
+  "description": "AlzMedia — Africa's Ad Network",
+  "main": "server/index.js",
+  "engines": { "node": ">=18.0.0" },
+  "scripts": {
+    "start":   "node server/index.js",
+    "dev":     "nodemon server/index.js",
+    "build":   "cd client && npm install && npm run build"
+  },
+  "dependencies": {
+    "express":            "^4.18.2",
+    "pg":                 "^8.11.3",
+    "bcryptjs":           "^2.4.3",
+    "jsonwebtoken":       "^9.0.2",
+    "dotenv":             "^16.3.1",
+    "express-rate-limit": "^7.1.5",
+    "helmet":             "^7.1.0",
+    "cors":               "^2.8.5",
+    "cookie-parser":      "^1.4.6",
+    "uuid":               "^9.0.1",
+    "axios":              "^1.6.2",
+    "multer":             "^1.4.5-lts.1",
+    "telegram":           "^2.19.7",
+    "xss":                "^1.0.14"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

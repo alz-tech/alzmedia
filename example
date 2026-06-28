@@ -1,0 +1,25 @@
+# ── SERVER ───────────────────────────────
+PORT=3000
+NODE_ENV=production
+SERVER_URL=https://api.alz.name.ng
+CLIENT_URL=https://media.alz.name.ng
+
+# ── DATABASE ─────────────────────────────
+DATABASE_URL=postgresql://user:password@host:5432/alzmedia
+
+# ── JWT ──────────────────────────────────
+JWT_SECRET=change_this_to_long_random_string
+JWT_REFRESH_SECRET=change_this_to_another_long_random_string
+
+# ── PAYSTACK ─────────────────────────────
+PAYSTACK_SECRET_KEY=sk_live_xxxxxxxxxxxxxxxxxxxx
+PAYSTACK_PUBLIC_KEY=pk_live_xxxxxxxxxxxxxxxxxxxx
+
+# ── TELEGRAM ─────────────────────────────
+TELEGRAM_API_ID=12345678
+TELEGRAM_API_HASH=abcdef1234567890abcdef1234567890
+TELEGRAM_SESSION=your_gramjs_session_string_here
+TELEGRAM_CHANNEL_ID=-100xxxxxxxxxx
+
+# ── SECURITY ─────────────────────────────
+IP_HASH_SECRET=random_secret_for_ip_hashing
