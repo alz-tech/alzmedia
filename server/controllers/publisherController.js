@@ -7,12 +7,18 @@ const db             = require('../config/db');
 const { success, error } = require('../utils/response');
 const { generateRef }    = require('../utils/generateId');
 
-async function getPublisher(user_id) {
+async function getPublisher(user_id, role) {
+  if (role === 'admin') return null;
   return Publisher.findByUserId(user_id);
 }
 
 // ── DASHBOARD STATS ──────────────────────────────────────────
 exports.getStats = async (req, res) => {
+  if (req.user.role === 'admin') return success(res, {
+    wallet_balance: 0, total_earned: 0, impressions_30d: 0,
+    clicks_30d: 0, site_count: 0, slot_count: 0, total_withdrawn: 0,
+  });
+  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform publisher actions', 403);
   const pub = await getPublisher(req.user.id);
   if (!pub) return error(res, 'Publisher profile not found', 404);
   const stats = await Publisher.stats(pub.id);
@@ -21,6 +27,7 @@ exports.getStats = async (req, res) => {
 
 // ── SITES ────────────────────────────────────────────────────
 exports.getSites = async (req, res) => {
+  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform publisher actions', 403);
   const pub = await getPublisher(req.user.id);
   if (!pub) return error(res, 'Publisher profile not found', 404);
   const { rows } = await db.query(
@@ -30,6 +37,7 @@ exports.getSites = async (req, res) => {
 };
 
 exports.addSite = async (req, res) => {
+  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform publisher actions', 403);
   const pub = await getPublisher(req.user.id);
   if (!pub) return error(res, 'Publisher profile not found', 404);
 
@@ -45,6 +53,7 @@ exports.addSite = async (req, res) => {
 };
 
 exports.deleteSite = async (req, res) => {
+  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform publisher actions', 403);
   const pub = await getPublisher(req.user.id);
   if (!pub) return error(res, 'Publisher profile not found', 404);
   await db.query(
@@ -56,6 +65,7 @@ exports.deleteSite = async (req, res) => {
 
 // ── AD SLOTS ─────────────────────────────────────────────────
 exports.getSlots = async (req, res) => {
+  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform publisher actions', 403);
   const pub = await getPublisher(req.user.id);
   if (!pub) return error(res, 'Publisher profile not found', 404);
   const slots = await AdSlot.byPublisher(pub.id);
@@ -63,6 +73,7 @@ exports.getSlots = async (req, res) => {
 };
 
 exports.createSlot = async (req, res) => {
+  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform publisher actions', 403);
   const pub = await getPublisher(req.user.id);
   if (!pub) return error(res, 'Publisher profile not found', 404);
 
@@ -81,6 +92,7 @@ exports.createSlot = async (req, res) => {
 };
 
 exports.toggleSlot = async (req, res) => {
+  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform publisher actions', 403);
   const pub = await getPublisher(req.user.id);
   if (!pub) return error(res, 'Publisher profile not found', 404);
   const result = await AdSlot.toggle(req.params.id, pub.id);
@@ -89,6 +101,7 @@ exports.toggleSlot = async (req, res) => {
 };
 
 exports.deleteSlot = async (req, res) => {
+  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform publisher actions', 403);
   const pub = await getPublisher(req.user.id);
   if (!pub) return error(res, 'Publisher profile not found', 404);
   await AdSlot.delete(req.params.id, pub.id);
@@ -97,6 +110,7 @@ exports.deleteSlot = async (req, res) => {
 
 // ── EARNINGS ─────────────────────────────────────────────────
 exports.getEarnings = async (req, res) => {
+  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform publisher actions', 403);
   const pub = await getPublisher(req.user.id);
   if (!pub) return error(res, 'Publisher profile not found', 404);
 
@@ -127,6 +141,7 @@ exports.getEarnings = async (req, res) => {
 
 // ── BANK & WITHDRAWAL ────────────────────────────────────────
 exports.updateBank = async (req, res) => {
+  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform publisher actions', 403);
   const pub = await getPublisher(req.user.id);
   if (!pub) return error(res, 'Publisher profile not found', 404);
 
@@ -141,6 +156,7 @@ exports.updateBank = async (req, res) => {
 exports.requestWithdrawal = async (req, res) => {
   if (!Paystack.isConfigured())
     return error(res, 'Withdrawals are temporarily unavailable. Payment system not yet configured.', 503);
+  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform publisher actions', 403);
   const pub = await getPublisher(req.user.id);
   if (!pub) return error(res, 'Publisher profile not found', 404);
 
@@ -208,6 +224,7 @@ exports.resolveAccount = async (req, res) => {
 
 // ── EMBED CODE ───────────────────────────────────────────────
 exports.getEmbedCode = async (req, res) => {
+  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform publisher actions', 403);
   const pub = await getPublisher(req.user.id);
   if (!pub) return error(res, 'Publisher profile not found', 404);
 

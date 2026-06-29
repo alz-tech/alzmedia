@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
 import StatsCard from '../../components/StatsCard';
+import LiveChart from '../../components/LiveChart';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
 import api from '../../services/api';
@@ -31,37 +32,48 @@ export default function AdvertiserDashboard() {
       </div>
 
       <div className="stats-grid">
-        <StatsCard label="Wallet Balance"    icon={ICON_W} color="purple"
+        <StatsCard label="Wallet Balance"   icon={ICON_W} color="purple"
           value={loading ? '—' : `₦${Number(stats?.wallet_balance || 0).toLocaleString()}`} />
-        <StatsCard label="Total Spent"       icon={ICON_S} color="green"
+        <StatsCard label="Total Spent"      icon={ICON_S} color="green"
           value={loading ? '—' : `₦${Number(stats?.total_spent || 0).toLocaleString()}`} />
-        <StatsCard label="Campaigns"         icon={ICON_C} color="purple"
+        <StatsCard label="Campaigns"        icon={ICON_C} color="purple"
           value={loading ? '—' : stats?.campaign_count || 0} />
-        <StatsCard label="Active Campaigns"  icon={ICON_A} color="green"
+        <StatsCard label="Active Campaigns" icon={ICON_A} color="green"
           value={loading ? '—' : stats?.active_campaigns || 0} />
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+      {/* Live spend chart — animated since advertisers may not have spend history API */}
+      <div className="card" style={{ marginBottom: 24 }}>
+        <LiveChart
+          animated
+          color="green"
+          title="Spend activity"
+          valuePrefix="₦"
+          height={180}
+        />
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
         <div className="card">
           <div className="card-title">Quick actions</div>
-          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-            <a href="/advertiser/campaigns"       className="btn btn-secondary">View campaigns</a>
-            <a href="/advertiser/campaigns/new"   className="btn btn-primary">Create campaign</a>
-            <a href="/advertiser/wallet"           className="btn btn-secondary">Fund wallet</a>
-            <a href="/advertiser/analytics"        className="btn btn-secondary">Analytics</a>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <a href="/advertiser/campaigns"     className="btn btn-secondary">View campaigns</a>
+            <a href="/advertiser/campaigns/new" className="btn btn-primary">Create campaign</a>
+            <a href="/advertiser/wallet"        className="btn btn-secondary">Fund wallet</a>
+            <a href="/advertiser/analytics"     className="btn btn-secondary">Analytics</a>
           </div>
         </div>
         <div className="card">
           <div className="card-title">Account summary</div>
-          <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {[
-              { label:'Total Funded', val: loading ? '—' : `₦${Number(stats?.total_funded||0).toLocaleString()}` },
-              { label:'Total Spent',  val: loading ? '—' : `₦${Number(stats?.total_spent||0).toLocaleString()}` },
-              { label:'Campaigns',    val: loading ? '—' : stats?.campaign_count || 0 },
+              { label: 'Total Funded', val: loading ? '—' : `₦${Number(stats?.total_funded || 0).toLocaleString()}` },
+              { label: 'Total Spent',  val: loading ? '—' : `₦${Number(stats?.total_spent  || 0).toLocaleString()}` },
+              { label: 'Campaigns',    val: loading ? '—' : stats?.campaign_count || 0 },
             ].map(({ label, val }) => (
-              <div key={label} style={{ display:'flex', justifyContent:'space-between', fontSize:14 }}>
-                <span style={{ color:'var(--text-muted)' }}>{label}</span>
-                <span style={{ fontWeight:600 }}>{val}</span>
+              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, alignItems: 'center' }}>
+                <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>{label}</span>
+                <span style={{ fontWeight: 600, fontFamily: 'var(--font-display)' }}>{val}</span>
               </div>
             ))}
           </div>
