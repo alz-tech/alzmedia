@@ -1,10 +1,10 @@
-import Sidebar from './Sidebar';
+import Navbar from './Navbar';
 import './DashboardLayout.css';
 
 export default function DashboardLayout({ children }) {
   return (
     <div className="dashboard-layout">
-      <Sidebar />
+      <Navbar />
       <main className="dashboard-main">
         {children}
       </main>

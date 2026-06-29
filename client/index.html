@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="description" content="AlzMedia — Africa's ad network. Run campaigns or earn Naira from your traffic."/>
-    <title>AlzMedia</title>
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AlzMedia — Ad Platform</title>
+    <meta name="description" content="Nigeria's leading digital advertising platform connecting publishers and advertisers.">
+    <!-- Prevent flash of wrong theme -->
+    <script>
+      (function() {
+        var t = localStorage.getItem('alzmedia-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', t);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <div id="toast-root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

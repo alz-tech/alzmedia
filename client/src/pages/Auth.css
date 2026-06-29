@@ -1,3 +1,7 @@
+/* ══════════════════════════
+   AUTH PAGES — Shared styles
+   ══════════════════════════ */
+
 .auth-page {
   background: var(--bg);
   min-height: 100vh;
@@ -79,10 +83,6 @@
   padding: 14px;
   font-size: 15px;
 }
-.auth-submit .spinner {
-  width: 18px; height: 18px;
-  border-width: 2px;
-}
 
 .auth-switch {
   text-align: center;
@@ -92,3 +92,7 @@
 }
 .auth-switch a { color: var(--purple-lt); font-weight: 500; }
 .auth-switch a:hover { text-decoration: underline; }
+
+@media (max-width: 480px) {
+  .auth-box { padding: 32px 22px; }
+}
