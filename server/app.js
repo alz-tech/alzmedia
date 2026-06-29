@@ -4,6 +4,7 @@ const helmet       = require('helmet');
 const cors         = require('cors');
 const cookieParser = require('cookie-parser');
 const path         = require('path');
+const fs           = require('fs');
 const sanitize     = require('./middleware/sanitize');
 
 const app = express();
@@ -24,7 +25,6 @@ app.use(helmet({
 }));
 
 // ── CORS ─────────────────────────────────────────────────────
-// Same origin — frontend and backend on same Render service
 app.use(cors({
   origin:      process.env.CLIENT_URL || true,
   credentials: true,
@@ -38,7 +38,7 @@ app.use(cookieParser());
 // ── INPUT SANITIZATION ───────────────────────────────────────
 app.use(sanitize);
 
-// ── TRUST PROXY (Render / Heroku) ────────────────────────────
+// ── TRUST PROXY (Render) ─────────────────────────────────────
 app.set('trust proxy', 1);
 
 // ── API ROUTES ───────────────────────────────────────────────
@@ -50,7 +50,6 @@ app.use('/api/ad',         require('./routes/ad'));
 app.use('/api/webhook',    require('./routes/webhook'));
 
 // ── SERVE EMBED SCRIPT ───────────────────────────────────────
-const fs = require('fs');
 app.get('/serve.js', (_req, res) => {
   const script = fs.readFileSync(path.join(__dirname, 'public/serve.js'), 'utf8')
     .replace('%%SERVER_URL%%', process.env.SERVER_URL || '');
@@ -62,16 +61,41 @@ app.get('/serve.js', (_req, res) => {
 // ── HEALTH CHECK ─────────────────────────────────────────────
 app.get('/health', (_req, res) => res.json({ status: 'ok', service: 'AlzMedia', version: '1.0.0' }));
 
-// ── SERVE REACT FRONTEND (built) ─────────────────────────────
-const distPath = path.join(__dirname, '../client/dist');
-app.use(express.static(distPath));
+// ── SERVE REACT FRONTEND ─────────────────────────────────────
+const distPath    = path.join(__dirname, '../client/dist');
+const indexPath   = path.join(distPath, 'index.html');
+const distExists  = fs.existsSync(indexPath);
 
-// All non-API routes → React app (React Router handles them)
+if (distExists) {
+  app.use(express.static(distPath));
+  console.log('✅ Serving React frontend from client/dist');
+} else {
+  console.warn('⚠️  client/dist not found — frontend not built yet');
+}
+
+// ── CATCH ALL ────────────────────────────────────────────────
 app.get('*', (req, res) => {
-  if (req.path.startsWith('/api') || req.path.startsWith('/serve.js') || req.path === '/health') {
+  // Don't catch API routes
+  if (req.path.startsWith('/api') || req.path === '/serve.js' || req.path === '/health') {
     return res.status(404).json({ success: false, message: 'Route not found' });
   }
-  res.sendFile(path.join(distPath, 'index.html'));
+
+  if (distExists) {
+    return res.sendFile(indexPath);
+  }
+
+  // Frontend not built — show helpful message
+  res.status(200).send(`
+    <!DOCTYPE html>
+    <html>
+    <head><title>AlzMedia</title></head>
+    <body style="background:#07070D;color:#F4F4FF;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;gap:16px;">
+      <h1 style="font-size:32px;margin:0"><span style="color:#9D5FF5">Alz</span>Media</h1>
+      <p style="color:#6B6B8A;margin:0">API is running. Frontend build not found.</p>
+      <p style="color:#6B6B8A;font-size:13px;margin:0">Run: npm run build</p>
+    </body>
+    </html>
+  `);
 });
 
 // ── GLOBAL ERROR HANDLER ─────────────────────────────────────
