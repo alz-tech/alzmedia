@@ -9,13 +9,27 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     api.get('/auth/me')
-      .then(r => setUser(r.data.data.user))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
+      .then(r => {
+        setUser(r.data.data.user);
+      })
+      .catch(() => {
+        setUser(null);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
-  const login  = (u) => setUser(u);
-  const logout = () => api.post('/auth/logout').finally(() => setUser(null));
+  const login = (u) => {
+    setUser(u);
+  };
+
+  const logout = () => {
+    api.post('/auth/logout')
+      .finally(() => {
+        setUser(null);
+      });
+  };
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout }}>
