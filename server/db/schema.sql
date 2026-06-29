@@ -54,7 +54,7 @@ CREATE TABLE publisher_sites (
   publisher_id     UUID REFERENCES publishers(id) ON DELETE CASCADE,
   name             VARCHAR(255) NOT NULL,
   url              VARCHAR(500),
-  platform_type    VARCHAR(20)  CHECK (platform_type IN ('website','android','windows','telegram','other')),
+  platform_type    VARCHAR(30)  CHECK (platform_type IN ('website','android','ios','mobile_app','windows','telegram','whatsapp','youtube','other')),
   status           VARCHAR(20)  DEFAULT 'pending' CHECK (status IN ('pending','approved','rejected','suspended')),
   rejection_reason TEXT,
   monthly_traffic  VARCHAR(50),
@@ -222,3 +222,12 @@ ALTER TABLE advertisers ADD COLUMN IF NOT EXISTS company_name VARCHAR(255);
 ALTER TABLE advertisers ADD COLUMN IF NOT EXISTS industry VARCHAR(100);
 ALTER TABLE advertisers ADD COLUMN IF NOT EXISTS budget_range VARCHAR(50);
 ALTER TABLE advertisers ADD COLUMN IF NOT EXISTS what_to_advertise TEXT;
+
+-- ── PLATFORM TYPE EXPANSION (migration for existing DBs) ─────
+ALTER TABLE publisher_sites DROP CONSTRAINT IF EXISTS publisher_sites_platform_type_check;
+ALTER TABLE publisher_sites ADD CONSTRAINT publisher_sites_platform_type_check
+  CHECK (platform_type IN ('website','android','ios','mobile_app','windows','telegram','whatsapp','youtube','other'));
+
+-- ── SEED TRACKING ────────────────────────────────────────────
+-- seed_v1_done is inserted at runtime by startup/seed.js
+-- Change to seed_v2_done in seed.js to trigger a fresh reset on next deploy

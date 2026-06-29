@@ -4,7 +4,7 @@
 
 .reg-page {
   align-items: flex-start;
-  padding: 32px 16px;
+  padding: 24px 16px;
   min-height: 100vh;
 }
 
@@ -15,14 +15,20 @@
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  padding: 36px 28px 32px;
+  padding: 32px 24px 28px;
   position: relative;
   z-index: 1;
-  animation: fadeUp 0.35s cubic-bezier(.22,1,.36,1) both;
+  animation: fadeUp 0.3s cubic-bezier(.22,1,.36,1) both;
 }
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile: full-screen card like an app */
+@media (max-width: 540px) {
+  .reg-page { padding: 0; }
+  .reg-box  { max-width: 100%; border-radius: 0; border-left: none; border-right: none; min-height: 100vh; padding: 36px 18px 28px; }
 }
 
 /* ── Step progress ── */
@@ -273,7 +279,6 @@
 .form-optional { color: var(--text-dim); font-size: 11px; margin-left: 4px; }
 
 @media (max-width: 480px) {
-  .reg-box { padding: 28px 18px 28px; }
   .reg-progress { gap: 0; }
   .reg-step-label { display: none; }
 }

@@ -11,6 +11,7 @@ router.get('/dashboard',                   ctrl.getDashboard);
 router.get('/users',                       ctrl.getUsers);
 router.post('/users/:id/ban',              ctrl.banUser);
 router.post('/users/:id/unban',            ctrl.unbanUser);
+router.delete('/users/:id',                ctrl.deleteUser);
 
 router.get('/sites/pending',               ctrl.getPendingSites);
 router.patch('/sites/:id/review',          ctrl.reviewSite);

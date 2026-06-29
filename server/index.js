@@ -1,6 +1,7 @@
 require('./config/env');
-const app = require('./app');
-const db  = require('./config/db');
+const app    = require('./app');
+const db     = require('./config/db');
+const runSeed = require('./startup/seed');
 
 const PORT = process.env.PORT || 3000;
 
@@ -13,6 +14,9 @@ async function start() {
     console.error('❌ Database connection failed:', err.message);
     process.exit(1);
   }
+
+  // Run one-time seed (safe — checks flag before doing anything)
+  await runSeed();
 
   app.listen(PORT, () => {
     console.log(`🚀 AlzMedia API running on port ${PORT}`);

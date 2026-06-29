@@ -14,6 +14,7 @@ const upload = multer({
 });
 
 router.post('/register',           authLimiter, ctrl.register);
+router.post('/check-email',        authLimiter, ctrl.checkEmail);
 router.post('/login',              authLimiter, ctrl.login);
 router.post('/refresh',            ctrl.refresh);
 router.post('/logout',             auth, ctrl.logout);

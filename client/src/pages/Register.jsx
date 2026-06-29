@@ -8,11 +8,20 @@ import './Register.css';
 
 const STEPS = ['Basic Info', 'Role Details', 'Verification', 'Terms', 'Verify Email'];
 
-const PLATFORM_TYPES = ['website', 'android', 'ios', 'windows', 'telegram', 'other'];
-const TRAFFIC_OPTIONS = ['Under 1,000/mo', '1K–10K/mo', '10K–50K/mo', '50K–200K/mo', '200K–1M/mo', '1M+/mo'];
-const CONTENT_CATS = ['News', 'Entertainment', 'Technology', 'Sports', 'Finance', 'Lifestyle', 'Education', 'Gaming', 'Other'];
-const INDUSTRIES = ['E-Commerce', 'Finance & Banking', 'Healthcare', 'Technology', 'Real Estate', 'Education', 'Food & Beverage', 'Fashion', 'Travel', 'Other'];
-const BUDGET_RANGES = ['Under ₦50K/mo', '₦50K–₦200K/mo', '₦200K–₦500K/mo', '₦500K–₦1M/mo', 'Over ₦1M/mo'];
+const PLATFORMS = [
+  { value: 'website',    label: 'Website',     icon: '🌐' },
+  { value: 'mobile_app', label: 'Mobile App',  icon: '📱' },
+  { value: 'android',    label: 'Android App', icon: '🤖' },
+  { value: 'ios',        label: 'iOS App',     icon: '🍎' },
+  { value: 'telegram',   label: 'Telegram',    icon: '✈️' },
+  { value: 'whatsapp',   label: 'WhatsApp',    icon: '💬' },
+  { value: 'youtube',    label: 'YouTube',     icon: '▶️' },
+  { value: 'other',      label: 'Other',       icon: '📦' },
+];
+const TRAFFIC_OPTIONS = ['Under 1,000/mo','1K–10K/mo','10K–50K/mo','50K–200K/mo','200K–1M/mo','1M+/mo'];
+const CONTENT_CATS    = ['News','Entertainment','Technology','Sports','Finance','Lifestyle','Education','Gaming','Other'];
+const INDUSTRIES      = ['E-Commerce','Finance & Banking','Healthcare','Technology','Real Estate','Education','Food & Beverage','Fashion','Travel','Other'];
+const BUDGET_RANGES   = ['Under ₦50K/mo','₦50K–₦200K/mo','₦200K–₦500K/mo','₦500K–₦1M/mo','Over ₦1M/mo'];
 
 const CHECK_ICON = (
   <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.2" width="12" height="12">
@@ -21,52 +30,68 @@ const CHECK_ICON = (
 );
 
 export default function Register({ role }) {
-  const navigate            = useNavigate();
-  const { login }           = useAuth();
-  const { success, error }  = useToast();
-  const [step, setStep]     = useState(1);
+  const navigate           = useNavigate();
+  const { login }          = useAuth();
+  const { success, error } = useToast();
+  const [step, setStep]    = useState(1);
   const [loading, setLoading] = useState(false);
-  const [userId, setUserId] = useState(null);
 
   const [form, setForm] = useState({
-    // Step 1
     full_name: '', email: '', password: '', confirm: '',
-    // Step 2 – Publisher
+    // Publisher
     site_name: '', site_url: '', platform_type: '', traffic: '', content_category: '',
-    // Step 2 – Advertiser
+    // Advertiser
     company_name: '', industry: '', budget_range: '', what_to_advertise: '',
-    // Step 3
+    // Verification
     id_doc: null,
-    // Step 4
+    // Terms
     agreed: false,
   });
-
   const [verifyCode, setVerifyCode] = useState('');
-  const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.value !== undefined ? e.value : e.target?.type === 'checkbox' ? e.target.checked : e.target.value }));
 
-  // ── Step validators ──
+  const setF = (k, v) => setForm(p => ({ ...p, [k]: v }));
+  const inp  = (k) => (e) => setF(k, e.target.value);
+
+  // ── Validators ──────────────────────────────────────────────
   function validateStep1() {
-    if (!form.full_name.trim()) return 'Full name is required';
-    if (!form.email.trim())     return 'Email is required';
-    if (!/\S+@\S+\.\S+/.test(form.email)) return 'Enter a valid email address';
-    if (form.password.length < 8) return 'Password must be at least 8 characters';
-    if (form.password !== form.confirm) return 'Passwords do not match';
+    if (!form.full_name.trim())              return 'Full name is required';
+    if (!form.email.trim())                  return 'Email is required';
+    if (!/\S+@\S+\.\S+/.test(form.email))   return 'Enter a valid email address';
+    if (form.password.length < 8)            return 'Password must be at least 8 characters';
+    if (form.password !== form.confirm)      return 'Passwords do not match';
     return null;
   }
   function validateStep2() {
     if (role === 'publisher') {
-      if (!form.site_name.trim()) return 'Site/app name is required';
-      if (!form.platform_type) return 'Platform type is required';
-      if (!form.traffic) return 'Monthly traffic estimate is required';
+      if (!form.site_name.trim()) return 'Site / app name is required';
+      if (!form.platform_type)   return 'Platform type is required';
+      if (!form.traffic)         return 'Monthly traffic estimate is required';
     } else {
-      if (!form.company_name.trim()) return 'Company/brand name is required';
-      if (!form.industry) return 'Industry is required';
-      if (!form.budget_range) return 'Budget range is required';
+      if (!form.company_name.trim()) return 'Company / brand name is required';
+      if (!form.industry)            return 'Industry is required';
+      if (!form.budget_range)        return 'Budget range is required';
     }
     return null;
   }
 
+  // ── Check email uniqueness before leaving step 1 ─────────────
+  async function checkEmailAndAdvance() {
+    const err = validateStep1();
+    if (err) return error(err);
+    setLoading(true);
+    try {
+      await api.post('/auth/check-email', { email: form.email });
+      setStep(2);
+    } catch (e) {
+      error(e.response?.data?.message || 'Email already registered. Try logging in instead.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ── Final registration: called on step 4 (Terms accept) ──────
   async function submitRegistration() {
+    if (!form.agreed) return error('You must accept the Terms & Privacy Policy');
     setLoading(true);
     try {
       const payload = {
@@ -76,39 +101,42 @@ export default function Register({ role }) {
         role,
         ...(role === 'publisher' ? {
           site_name: form.site_name,
-          site_url: form.site_url,
+          site_url:  form.site_url,
           platform_type: form.platform_type,
-          traffic: form.traffic,
+          traffic:   form.traffic,
           content_category: form.content_category,
         } : {
-          company_name: form.company_name,
-          industry: form.industry,
-          budget_range: form.budget_range,
+          company_name:    form.company_name,
+          industry:        form.industry,
+          budget_range:    form.budget_range,
           what_to_advertise: form.what_to_advertise,
         }),
       };
+
       const res = await api.post('/auth/register', payload);
-      setUserId(res.data.data.user.id);
       login(res.data.data.user);
 
       // Upload ID doc if provided
       if (form.id_doc) {
         const fd = new FormData();
         fd.append('document', form.id_doc);
-        await api.post('/auth/upload-id', fd, { headers: { 'Content-Type': 'multipart/form-data' } }).catch(() => {});
+        await api.post('/auth/upload-id', fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }).catch(() => {});
       }
 
-      // Send email verification
+      // Send email verification code
       await api.post('/auth/send-verification').catch(() => {});
       success('Account created! Check your email for a verification code.');
       setStep(5);
-    } catch (err) {
-      error(err.response?.data?.message || 'Registration failed. Please try again.');
+    } catch (e) {
+      error(e.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
   }
 
+  // ── Email verify step ────────────────────────────────────────
   async function verifyEmail() {
     if (!verifyCode.trim()) return error('Enter the verification code');
     setLoading(true);
@@ -116,27 +144,18 @@ export default function Register({ role }) {
       await api.post('/auth/verify-email', { code: verifyCode });
       success('Email verified! Welcome to AlzMedia.');
       navigate(`/${role}`);
-    } catch (err) {
-      error(err.response?.data?.message || 'Invalid or expired code. Try again.');
+    } catch (e) {
+      error(e.response?.data?.message || 'Invalid or expired code. Try again.');
     } finally {
       setLoading(false);
     }
   }
 
-  function nextStep() {
-    if (step === 1) {
-      const err = validateStep1();
-      if (err) return error(err);
-    }
-    if (step === 2) {
-      const err = validateStep2();
-      if (err) return error(err);
-    }
-    if (step === 4) {
-      if (!form.agreed) return error('You must accept the Terms & Privacy Policy');
-      submitRegistration();
-      return;
-    }
+  // ── Next / submit router ─────────────────────────────────────
+  async function handleNext() {
+    if (step === 1) { await checkEmailAndAdvance(); return; }
+    if (step === 2) { const e = validateStep2(); if (e) return error(e); }
+    if (step === 4) { await submitRegistration(); return; }
     setStep(s => s + 1);
   }
 
@@ -146,24 +165,22 @@ export default function Register({ role }) {
     <div className="auth-page reg-page">
       <div className="auth-glow" />
       <div className="reg-box">
-        {/* Header */}
+        {/* Logo */}
         <Link to="/" className="auth-logo">
           <span className="logo-alz">Alz</span><span className="logo-media">Media</span>
         </Link>
 
-        {/* Step progress */}
+        {/* Progress */}
         <div className="reg-progress">
           {STEPS.map((name, i) => {
             const n = i + 1;
-            const done = n < step;
+            const done   = n < step;
             const active = n === step;
             return (
-              <div key={n} className={`reg-step ${done ? 'done' : active ? 'active' : ''}`}>
-                <div className="reg-step-dot">
-                  {done ? CHECK_ICON : n}
-                </div>
+              <div key={n} className={`reg-step${done ? ' done' : active ? ' active' : ''}`}>
+                <div className="reg-step-dot">{done ? CHECK_ICON : n}</div>
                 <div className="reg-step-label">{name}</div>
-                {i < STEPS.length - 1 && <div className={`reg-step-line ${done ? 'done' : ''}`} />}
+                {i < STEPS.length - 1 && <div className={`reg-step-line${done ? ' done' : ''}`} />}
               </div>
             );
           })}
@@ -179,22 +196,22 @@ export default function Register({ role }) {
             <div className="form-group">
               <label className="form-label">Full name</label>
               <input className="form-input" type="text" placeholder="Your full name"
-                value={form.full_name} onChange={e => set('full_name')(e)} autoComplete="name" />
+                value={form.full_name} onChange={inp('full_name')} autoComplete="name" />
             </div>
             <div className="form-group">
               <label className="form-label">Email address</label>
               <input className="form-input" type="email" placeholder="you@example.com"
-                value={form.email} onChange={e => set('email')(e)} autoComplete="email" />
+                value={form.email} onChange={inp('email')} autoComplete="email" />
             </div>
             <div className="form-group">
               <label className="form-label">Password</label>
               <input className="form-input" type="password" placeholder="Minimum 8 characters"
-                value={form.password} onChange={e => set('password')(e)} autoComplete="new-password" />
+                value={form.password} onChange={inp('password')} autoComplete="new-password" />
             </div>
             <div className="form-group">
               <label className="form-label">Confirm password</label>
               <input className="form-input" type="password" placeholder="Repeat password"
-                value={form.confirm} onChange={e => set('confirm')(e)} autoComplete="new-password" />
+                value={form.confirm} onChange={inp('confirm')} autoComplete="new-password" />
             </div>
           </div>
         )}
@@ -203,29 +220,35 @@ export default function Register({ role }) {
         {step === 2 && (
           <div className="reg-panel">
             <div className={`auth-role-badge ${role}`}>{label} details</div>
-            <h2 className="reg-heading">{role === 'publisher' ? 'Tell us about your platform' : 'Tell us about your business'}</h2>
-            <p className="reg-sub">{role === 'publisher' ? 'We use this to match you with relevant ads' : 'We use this to help you reach the right audience'}</p>
+            <h2 className="reg-heading">
+              {role === 'publisher' ? 'Tell us about your platform' : 'Tell us about your business'}
+            </h2>
+            <p className="reg-sub">
+              {role === 'publisher'
+                ? 'We use this to match you with relevant ads'
+                : 'We use this to help you reach the right audience'}
+            </p>
 
             {role === 'publisher' ? (
               <>
                 <div className="form-group">
                   <label className="form-label">Site / App name <span className="form-required">*</span></label>
                   <input className="form-input" type="text" placeholder="e.g. My Tech Blog"
-                    value={form.site_name} onChange={e => set('site_name')(e)} />
+                    value={form.site_name} onChange={inp('site_name')} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">URL or Package name <span className="form-optional">(optional)</span></label>
                   <input className="form-input" type="text" placeholder="https://example.com or com.example.app"
-                    value={form.site_url} onChange={e => set('site_url')(e)} />
+                    value={form.site_url} onChange={inp('site_url')} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Platform type <span className="form-required">*</span></label>
                   <div className="reg-chip-grid">
-                    {PLATFORM_TYPES.map(p => (
-                      <button key={p} type="button"
-                        className={`reg-chip ${form.platform_type === p ? 'active' : ''}`}
-                        onClick={() => setForm(f => ({ ...f, platform_type: p }))}>
-                        {p.charAt(0).toUpperCase() + p.slice(1)}
+                    {PLATFORMS.map(p => (
+                      <button key={p.value} type="button"
+                        className={`reg-chip${form.platform_type === p.value ? ' active' : ''}`}
+                        onClick={() => setF('platform_type', p.value)}>
+                        {p.icon} {p.label}
                       </button>
                     ))}
                   </div>
@@ -235,10 +258,8 @@ export default function Register({ role }) {
                   <div className="reg-chip-grid">
                     {TRAFFIC_OPTIONS.map(t => (
                       <button key={t} type="button"
-                        className={`reg-chip ${form.traffic === t ? 'active' : ''}`}
-                        onClick={() => setForm(f => ({ ...f, traffic: t }))}>
-                        {t}
-                      </button>
+                        className={`reg-chip${form.traffic === t ? ' active' : ''}`}
+                        onClick={() => setF('traffic', t)}>{t}</button>
                     ))}
                   </div>
                 </div>
@@ -247,10 +268,8 @@ export default function Register({ role }) {
                   <div className="reg-chip-grid">
                     {CONTENT_CATS.map(c => (
                       <button key={c} type="button"
-                        className={`reg-chip ${form.content_category === c ? 'active' : ''}`}
-                        onClick={() => setForm(f => ({ ...f, content_category: c }))}>
-                        {c}
-                      </button>
+                        className={`reg-chip${form.content_category === c ? ' active' : ''}`}
+                        onClick={() => setF('content_category', c)}>{c}</button>
                     ))}
                   </div>
                 </div>
@@ -260,17 +279,15 @@ export default function Register({ role }) {
                 <div className="form-group">
                   <label className="form-label">Company / Brand name <span className="form-required">*</span></label>
                   <input className="form-input" type="text" placeholder="e.g. Acme Corp"
-                    value={form.company_name} onChange={e => set('company_name')(e)} />
+                    value={form.company_name} onChange={inp('company_name')} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Industry <span className="form-required">*</span></label>
                   <div className="reg-chip-grid">
                     {INDUSTRIES.map(ind => (
                       <button key={ind} type="button"
-                        className={`reg-chip ${form.industry === ind ? 'active' : ''}`}
-                        onClick={() => setForm(f => ({ ...f, industry: ind }))}>
-                        {ind}
-                      </button>
+                        className={`reg-chip${form.industry === ind ? ' active' : ''}`}
+                        onClick={() => setF('industry', ind)}>{ind}</button>
                     ))}
                   </div>
                 </div>
@@ -279,17 +296,15 @@ export default function Register({ role }) {
                   <div className="reg-chip-grid">
                     {BUDGET_RANGES.map(b => (
                       <button key={b} type="button"
-                        className={`reg-chip ${form.budget_range === b ? 'active' : ''}`}
-                        onClick={() => setForm(f => ({ ...f, budget_range: b }))}>
-                        {b}
-                      </button>
+                        className={`reg-chip${form.budget_range === b ? ' active' : ''}`}
+                        onClick={() => setF('budget_range', b)}>{b}</button>
                     ))}
                   </div>
                 </div>
                 <div className="form-group">
                   <label className="form-label">What do you want to advertise? <span className="form-optional">(optional)</span></label>
                   <textarea className="form-textarea" placeholder="Briefly describe your product or service..."
-                    value={form.what_to_advertise} onChange={e => set('what_to_advertise')(e)} rows={3} />
+                    value={form.what_to_advertise} onChange={inp('what_to_advertise')} rows={3} />
                 </div>
               </>
             )}
@@ -301,21 +316,20 @@ export default function Register({ role }) {
           <div className="reg-panel">
             <div className="auth-role-badge publisher">Verification</div>
             <h2 className="reg-heading">Identity verification</h2>
-            <p className="reg-sub">Upload a government-issued ID or CAC document. Your account will be reviewed once submitted.</p>
+            <p className="reg-sub">Upload a government-issued ID or CAC document. Optional — you can do this later.</p>
 
             <div className="reg-upload-area"
               onClick={() => document.getElementById('id-doc-input').click()}
               onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('drag'); }}
               onDragLeave={e => e.currentTarget.classList.remove('drag')}
               onDrop={e => {
-                e.preventDefault();
-                e.currentTarget.classList.remove('drag');
+                e.preventDefault(); e.currentTarget.classList.remove('drag');
                 const file = e.dataTransfer.files[0];
-                if (file) setForm(f => ({ ...f, id_doc: file }));
+                if (file) setF('id_doc', file);
               }}>
               <input id="id-doc-input" type="file" accept="image/*,.pdf"
                 style={{ display: 'none' }}
-                onChange={e => setForm(f => ({ ...f, id_doc: e.target.files[0] }))} />
+                onChange={e => setF('id_doc', e.target.files[0])} />
               {form.id_doc ? (
                 <div className="reg-upload-chosen">
                   <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="1.7" width="28" height="28">
@@ -328,21 +342,24 @@ export default function Register({ role }) {
                 </div>
               ) : (
                 <div className="reg-upload-placeholder">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="32" height="32" style={{ color: 'var(--text-dim)' }}>
-                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" strokeLinecap="round" strokeLinejoin="round"/>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
+                    width="32" height="32" style={{ color: 'var(--text-dim)' }}>
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"
+                      strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                   <div className="reg-upload-hint">Tap to upload or drag a file here</div>
-                  <div className="reg-upload-sub">NIN card, Driver's licence, Int'l passport or CAC document</div>
+                  <div className="reg-upload-sub">NIN card, Driver's licence, Int'l passport or CAC</div>
                   <div className="reg-upload-sub">JPG, PNG or PDF — max 5MB</div>
                 </div>
               )}
             </div>
 
             <div className="reg-info-box">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" width="16" height="16" style={{ flexShrink: 0, color: 'var(--purple-lt)' }}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"
+                width="16" height="16" style={{ flexShrink: 0, color: 'var(--purple-lt)' }}>
                 <circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>
               </svg>
-              <span>Your document is stored securely. Account review typically takes under 24 hours.</span>
+              <span>Document stored securely. Review typically takes under 24 hours.</span>
             </div>
 
             <button type="button" className="reg-skip" onClick={() => setStep(4)}>
@@ -356,16 +373,16 @@ export default function Register({ role }) {
           <div className="reg-panel">
             <div className="auth-role-badge advertiser">Almost done</div>
             <h2 className="reg-heading">Terms & Privacy</h2>
-            <p className="reg-sub">Review and accept before creating your account</p>
+            <p className="reg-sub">Review and accept to create your account</p>
 
             <div className="reg-terms-box">
-              <p>By creating an account, you confirm that you are at least 18 years old and agree to our <strong>Terms of Service</strong> and <strong>Privacy Policy</strong>. You consent to receive platform notifications related to your account, campaigns, and earnings.</p>
+              <p>By creating an account, you confirm you are at least 18 years old and agree to our <strong>Terms of Service</strong> and <strong>Privacy Policy</strong>. You consent to receive platform notifications related to your account, campaigns, and earnings.</p>
               <p style={{ marginTop: 12 }}>AlzMedia reserves the right to review and approve accounts before granting full access. Ad campaigns and publisher sites are subject to content guidelines.</p>
             </div>
 
             <label className="reg-checkbox-row">
               <input type="checkbox" checked={form.agreed}
-                onChange={e => setForm(f => ({ ...f, agreed: e.target.checked }))} />
+                onChange={e => setF('agreed', e.target.checked)} />
               <span className="reg-checkbox-box">{form.agreed && CHECK_ICON}</span>
               <span>I accept the Terms of Service and Privacy Policy</span>
             </label>
@@ -382,7 +399,9 @@ export default function Register({ role }) {
               </svg>
             </div>
             <h2 className="reg-heading">Verify your email</h2>
-            <p className="reg-sub">We sent a 6-digit code to <strong>{form.email}</strong>. Enter it below to activate your account.</p>
+            <p className="reg-sub">
+              We sent a 6-digit code to <strong>{form.email}</strong>. Enter it below to activate your account.
+            </p>
 
             <div className="form-group" style={{ marginTop: 24 }}>
               <label className="form-label">Verification code</label>
@@ -391,14 +410,15 @@ export default function Register({ role }) {
                 value={verifyCode} onChange={e => setVerifyCode(e.target.value.replace(/\D/g, ''))} />
             </div>
 
-            <button className="btn btn-primary btn-full reg-next-btn" onClick={verifyEmail} disabled={loading}>
+            <button className="btn btn-primary btn-full reg-next-btn"
+              onClick={verifyEmail} disabled={loading}>
               {loading ? <span className="spinner" /> : 'Verify & enter dashboard'}
             </button>
 
             <button className="reg-skip" style={{ marginTop: 16 }}
               onClick={async () => {
                 try { await api.post('/auth/send-verification'); success('Code resent!'); }
-                catch { error('Could not resend code. Try again.'); }
+                catch { error('Could not resend. Try again.'); }
               }}>
               Resend code
             </button>
@@ -410,7 +430,7 @@ export default function Register({ role }) {
           </div>
         )}
 
-        {/* Navigation buttons */}
+        {/* Navigation */}
         {step < 5 && (
           <div className="reg-actions">
             {step > 1 && (
@@ -418,7 +438,7 @@ export default function Register({ role }) {
                 Back
               </button>
             )}
-            <button className="btn btn-primary reg-next-btn" onClick={nextStep} disabled={loading}>
+            <button className="btn btn-primary reg-next-btn" onClick={handleNext} disabled={loading}>
               {loading ? <span className="spinner" /> : step === 4 ? 'Create account' : 'Continue'}
               {!loading && step < 4 && (
                 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
