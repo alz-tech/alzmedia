@@ -108,6 +108,10 @@ export default function Navbar() {
   const effectiveRole = user?.role === 'admin' ? adminView : user?.role;
   const links = (user?.role === 'admin' ? ADMIN_VIEWS[adminView].links : NAV[user?.role]) || [];
 
+  // Bottom tab bar shows primary 4–5 links (the rest go in the slide menu)
+  const TAB_LIMIT = 4;
+  const tabLinks   = links.slice(0, TAB_LIMIT);
+
   return (
     <>
       <nav className="navbar" ref={menuRef}>
@@ -119,18 +123,17 @@ export default function Navbar() {
 
           <div className="navbar-right">
             {/* Theme toggle */}
-            <button className="navbar-icon-btn" onClick={toggle} aria-label="Toggle theme" title={theme === 'dark' ? 'Switch to light' : 'Switch to dark'}>
+            <button className="navbar-icon-btn" onClick={toggle} aria-label="Toggle theme">
               {theme === 'dark' ? ICONS.sun : ICONS.moon}
             </button>
 
-            {/* User avatar / role */}
             {user && (
               <div className="navbar-avatar" title={user.full_name}>
                 {user.full_name?.[0]?.toUpperCase()}
               </div>
             )}
 
-            {/* Hamburger */}
+            {/* Hamburger (opens profile / overflow menu) */}
             <button
               className={`navbar-hamburger ${open ? 'open' : ''}`}
               onClick={() => setOpen(o => !o)}
@@ -142,7 +145,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Dropdown menu */}
+        {/* Slide-down menu */}
         <div className={`navbar-menu ${open ? 'open' : ''}`} aria-hidden={!open}>
           <div className="navbar-menu-inner">
 
@@ -152,11 +155,9 @@ export default function Navbar() {
                 <div className="navbar-section-label">Switch view</div>
                 <div className="navbar-switch-btns">
                   {Object.entries(ADMIN_VIEWS).map(([view, { label }]) => (
-                    <button
-                      key={view}
+                    <button key={view}
                       className={`navbar-switch-btn ${adminView === view ? 'active' : ''}`}
-                      onClick={() => { setAdminView(view); }}
-                    >
+                      onClick={() => setAdminView(view)}>
                       {label}
                     </button>
                   ))}
@@ -164,12 +165,12 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* Nav links */}
             {user && (
               <div className="navbar-section-label">
                 {user.role === 'admin' ? ADMIN_VIEWS[adminView].label : user.role}
               </div>
             )}
+
             <nav className="navbar-links">
               {links.map(({ to, label, icon, end }) => (
                 <NavLink key={to} to={to} end={end}
@@ -180,7 +181,6 @@ export default function Navbar() {
               ))}
             </nav>
 
-            {/* Footer */}
             {user && (
               <div className="navbar-menu-footer">
                 <div className="navbar-user-info">
@@ -197,7 +197,6 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* Close button */}
             <button className="navbar-close-btn" onClick={() => setOpen(false)} aria-label="Close menu">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round"/>
@@ -209,6 +208,32 @@ export default function Navbar() {
 
       {/* Backdrop */}
       {open && <div className="navbar-backdrop" onClick={() => setOpen(false)} />}
+
+      {/* ── BOTTOM TAB BAR (mobile) ── */}
+      {user && (
+        <div className="tab-bar">
+          <div className="tab-bar-inner">
+            {tabLinks.map(({ to, label, icon, end }) => (
+              <NavLink key={to} to={to} end={end}
+                className={({ isActive }) => `tab-item${isActive ? ' active' : ''}`}>
+                {ICONS[icon]}
+                <span>{label}</span>
+              </NavLink>
+            ))}
+            {/* More button to open the slide menu if there are extra links */}
+            {links.length > TAB_LIMIT && (
+              <button className={`tab-item${open ? ' active' : ''}`} onClick={() => setOpen(o => !o)}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+                  <circle cx="12" cy="5"  r="1.2" fill="currentColor"/>
+                  <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
+                  <circle cx="12" cy="19" r="1.2" fill="currentColor"/>
+                </svg>
+                <span>More</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -1,7 +1,13 @@
-/* ══════════════════════
-   NAVBAR — Top bar
-   ══════════════════════ */
+/* ══════════════════════════════════════
+   NAVBAR — Fixed top bar + bottom tab bar
+   ══════════════════════════════════════ */
 
+:root {
+  --nav-height:    56px;
+  --tab-bar-height: 60px;
+}
+
+/* ── TOP BAR ─────────────────────────────────────────────── */
 .navbar {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -14,26 +20,25 @@
 
 .navbar-inner {
   height: 100%;
-  max-width: 1280px;
+  max-width: 540px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-/* ── Logo ── */
+/* Logo */
 .navbar-logo {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 700;
   letter-spacing: -0.5px;
-  line-height: 1;
 }
 .logo-alz   { color: var(--purple-lt); }
 .logo-media { color: var(--text); }
 
-/* ── Right cluster ── */
+/* Right cluster */
 .navbar-right {
   display: flex;
   align-items: center;
@@ -41,7 +46,7 @@
 }
 
 .navbar-icon-btn {
-  width: 36px; height: 36px;
+  width: 34px; height: 34px;
   border-radius: var(--radius);
   background: var(--bg3);
   border: 1px solid var(--border);
@@ -49,29 +54,31 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  transition: color 0.15s, border-color 0.15s;
+  flex-shrink: 0;
 }
 .navbar-icon-btn:hover { color: var(--text); border-color: var(--border-light); }
-.navbar-icon-btn svg { width: 17px; height: 17px; }
+.navbar-icon-btn svg { width: 16px; height: 16px; }
 
 .navbar-avatar {
-  width: 34px; height: 34px;
+  width: 32px; height: 32px;
   border-radius: 50%;
   background: var(--purple-dim);
   border: 1px solid var(--purple-border);
   color: var(--purple-lt);
   font-weight: 700;
-  font-size: 14px;
+  font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
   user-select: none;
+  flex-shrink: 0;
 }
 
-/* ── Hamburger ── */
+/* Hamburger (shown for profile/overflow menu) */
 .navbar-hamburger {
-  width: 36px; height: 36px;
+  width: 34px; height: 34px;
   border-radius: var(--radius);
   background: var(--bg3);
   border: 1px solid var(--border);
@@ -79,26 +86,24 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
   transition: border-color 0.15s;
+  flex-shrink: 0;
 }
 .navbar-hamburger:hover { border-color: var(--border-light); }
 .navbar-hamburger span {
   display: block;
-  width: 18px; height: 1.5px;
+  width: 16px; height: 1.5px;
   background: var(--text-muted);
   border-radius: 2px;
-  transition: transform 0.2s, opacity 0.2s, width 0.2s;
+  transition: transform 0.2s, opacity 0.2s;
   transform-origin: center;
 }
-.navbar-hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); background: var(--text); }
+.navbar-hamburger.open span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); background: var(--text); }
 .navbar-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-.navbar-hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); background: var(--text); }
+.navbar-hamburger.open span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); background: var(--text); }
 
-/* ══════════════════════
-   DROP-DOWN MENU
-   ══════════════════════ */
-
+/* ── SLIDE-DOWN PROFILE MENU ─────────────────────────────── */
 .navbar-menu {
   position: fixed;
   top: var(--nav-height);
@@ -117,17 +122,16 @@
 .navbar-menu-inner {
   background: var(--bg2);
   border-bottom: 1px solid var(--border);
-  padding: 20px 20px 24px;
-  max-width: 480px;
+  padding: 16px 16px 20px;
+  max-width: 540px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   position: relative;
-  /* slide in from top */
-  transform: translateY(-12px);
+  transform: translateY(-8px);
   opacity: 0;
-  transition: transform 0.28s cubic-bezier(.22,1,.36,1), opacity 0.22s ease;
+  transition: transform 0.28s cubic-bezier(.22,1,.36,1), opacity 0.2s ease;
   max-height: calc(100vh - var(--nav-height));
   overflow-y: auto;
 }
@@ -136,7 +140,7 @@
   opacity: 1;
 }
 
-/* ── Section label ── */
+/* Section label */
 .navbar-section-label {
   font-size: 10px;
   font-weight: 700;
@@ -146,21 +150,20 @@
   padding: 8px 8px 4px;
 }
 
-/* ── Admin switcher ── */
+/* Admin switcher */
 .navbar-admin-switch {
   margin-bottom: 4px;
-  padding-bottom: 16px;
+  padding-bottom: 14px;
   border-bottom: 1px solid var(--border);
 }
 .navbar-switch-btns {
   display: flex;
   gap: 6px;
   padding: 4px 0;
-  flex-wrap: wrap;
 }
 .navbar-switch-btn {
   flex: 1;
-  padding: 7px 10px;
+  padding: 8px 6px;
   border-radius: var(--radius);
   font-size: 12px;
   font-weight: 600;
@@ -171,26 +174,26 @@
   transition: all 0.15s;
   white-space: nowrap;
 }
-.navbar-switch-btn:hover { color: var(--text); border-color: var(--border-light); }
+.navbar-switch-btn:hover  { color: var(--text); border-color: var(--border-light); }
 .navbar-switch-btn.active {
   background: var(--purple-dim);
   color: var(--purple-lt);
   border-color: var(--purple-border);
 }
 
-/* ── Nav links ── */
+/* Nav links (inside slide menu — shown on ALL screen sizes as overflow) */
 .navbar-links {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding-bottom: 12px;
+  padding-bottom: 10px;
 }
 
 .navbar-link {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 12px;
+  padding: 11px 12px;
   border-radius: var(--radius);
   font-size: 15px;
   font-weight: 500;
@@ -198,30 +201,24 @@
   transition: background 0.12s, color 0.12s;
   border: 1px solid transparent;
 }
-.navbar-link:hover { background: var(--bg3); color: var(--text); }
+.navbar-link:hover  { background: var(--bg3); color: var(--text); }
 .navbar-link.active {
   background: var(--purple-dim);
   color: var(--purple-lt);
   border-color: var(--purple-border);
 }
-
-.navbar-link-icon {
-  width: 20px; height: 20px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
+.navbar-link-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .navbar-link-icon svg { width: 18px; height: 18px; }
 
-/* ── Menu footer ── */
+/* Menu footer */
 .navbar-menu-footer {
   margin-top: 8px;
-  padding-top: 16px;
+  padding-top: 14px;
   border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
-
 .navbar-user-info {
   display: flex;
   align-items: center;
@@ -229,31 +226,21 @@
   padding: 0 4px;
 }
 .navbar-user-avatar {
-  width: 36px; height: 36px;
+  width: 34px; height: 34px;
   border-radius: 50%;
   background: var(--purple-dim);
   border: 1px solid var(--purple-border);
   color: var(--purple-lt);
   font-weight: 700;
-  font-size: 14px;
+  font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   font-family: var(--font-display);
 }
-.navbar-user-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-}
-.navbar-user-email {
-  font-size: 12px;
-  color: var(--text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.navbar-user-name  { font-size: 14px; font-weight: 600; color: var(--text); }
+.navbar-user-email { font-size: 12px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .navbar-logout {
   display: flex;
@@ -268,20 +255,15 @@
   border: 1px solid transparent;
   width: 100%;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
-  text-align: left;
 }
-.navbar-logout:hover {
-  background: #F8717110;
-  color: var(--red);
-  border-color: #F8717122;
-}
-.navbar-logout svg { width: 18px; height: 18px; flex-shrink: 0; }
+.navbar-logout:hover { background: #F8717110; color: var(--red); border-color: #F8717122; }
+.navbar-logout svg  { width: 18px; height: 18px; flex-shrink: 0; }
 
-/* ── Close X ── */
+/* Close button */
 .navbar-close-btn {
   position: absolute;
-  top: 16px; right: 16px;
-  width: 34px; height: 34px;
+  top: 14px; right: 14px;
+  width: 32px; height: 32px;
   border-radius: var(--radius);
   background: var(--bg3);
   border: 1px solid var(--border);
@@ -289,24 +271,73 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.15s, border-color 0.15s;
 }
-.navbar-close-btn:hover { color: var(--text); border-color: var(--border-light); }
-.navbar-close-btn svg { width: 16px; height: 16px; }
+.navbar-close-btn:hover { color: var(--text); }
+.navbar-close-btn svg { width: 15px; height: 15px; }
 
-/* ── Backdrop ── */
+/* Backdrop */
 .navbar-backdrop {
   position: fixed;
   inset: 0;
   top: var(--nav-height);
-  background: #00000055;
+  background: #00000060;
   z-index: 198;
   backdrop-filter: blur(2px);
-  animation: fadeIn 0.15s ease;
+  animation: bFadeIn 0.15s ease;
 }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes bFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* Desktop: wider menu */
-@media (min-width: 768px) {
-  .navbar-menu-inner { max-width: 400px; margin-left: auto; margin-right: 20px; }
+/* ══════════════════════════════════════
+   BOTTOM TAB BAR (mobile app feel)
+   ══════════════════════════════════════ */
+.tab-bar {
+  display: none; /* shown on mobile below */
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: var(--tab-bar-height);
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  z-index: 200;
+  padding: 0 4px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.tab-bar-inner {
+  height: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  flex: 1;
+  padding: 6px 4px;
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  font-size: 10px;
+  font-weight: 500;
+  font-family: var(--font-display);
+  border: none;
+  background: none;
+  transition: color 0.15s;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.tab-item svg { width: 20px; height: 20px; }
+.tab-item.active { color: var(--purple-lt); }
+.tab-item:not(.active):hover { color: var(--text-muted); }
+
+/* Pill indicator on active tab icon */
+.tab-item.active svg {
+  filter: drop-shadow(0 0 4px var(--purple-lt));
+}
+
+@media (max-width: 768px) {
+  .tab-bar { display: flex; }
 }

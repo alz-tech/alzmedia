@@ -27,6 +27,15 @@ function setCookies(res, accessToken, refreshToken) {
   });
 }
 
+// ── CHECK EMAIL (used by frontend step 1 before advancing) ───
+exports.checkEmail = async (req, res) => {
+  const { email } = req.body;
+  if (!email) return error(res, 'Email is required');
+  const existing = await User.findByEmail(email);
+  if (existing) return error(res, 'Email already registered. Please sign in instead.', 409);
+  return success(res, null, 'Email available');
+};
+
 exports.register = async (req, res) => {
   const { email, password, full_name, role,
     // Publisher extras
@@ -88,10 +97,10 @@ exports.sendVerification = async (req, res) => {
   const userId = req.user.id;
   const user   = await User.findById(userId);
   if (!user) return error(res, 'User not found', 404);
-  if (user.is_verified) return error(res, 'Already verified');
+  if (user.is_verified) return error(res, 'Email already verified');
 
   // Generate 6-digit code
-  const code = String(Math.floor(100000 + Math.random() * 900000));
+  const code      = String(Math.floor(100000 + Math.random() * 900000));
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
   // Invalidate old codes
@@ -101,17 +110,26 @@ exports.sendVerification = async (req, res) => {
     [userId, code, expiresAt]
   );
 
-  // Send email (gracefully skip if not configured)
-  try {
-    const fullUser = await db.query('SELECT email FROM users WHERE id=$1', [userId]).then(r => r.rows[0]);
-    await sendVerificationEmail(fullUser.email, code);
-  } catch (e) {
-    console.warn('[Auth] Email send failed:', e.message);
+  // Get email
+  const { rows: [row] } = await db.query('SELECT email FROM users WHERE id=$1', [userId]);
+
+  // Try to send email
+  const smtpConfigured = !!(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
+  if (smtpConfigured) {
+    try {
+      await sendVerificationEmail(row.email, code);
+    } catch (e) {
+      console.error('[Auth] Email send failed:', e.message);
+      // Return code in response as fallback so user isn't stuck
+      return success(res, { code, _note: 'Email send failed — code returned for testing' }, 'Email send failed, code returned');
+    }
+  } else {
+    console.warn('[Auth] SMTP not configured — skipping email send');
   }
 
-  // In dev/no-SMTP: return code in response so you can test
-  const isDev = process.env.NODE_ENV !== 'production';
-  return success(res, isDev ? { code } : null, 'Verification code sent');
+  // In dev or when SMTP not set: return code so you can test
+  const devMode = process.env.NODE_ENV !== 'production' || !smtpConfigured;
+  return success(res, devMode ? { code } : null, 'Verification code sent');
 };
 
 exports.verifyEmail = async (req, res) => {

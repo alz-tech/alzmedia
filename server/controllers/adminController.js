@@ -47,6 +47,16 @@ exports.unbanUser = async (req, res) => {
   return success(res, null, 'User unbanned');
 };
 
+exports.deleteUser = async (req, res) => {
+  if (req.params.id === req.user.id) return error(res, 'Cannot delete yourself');
+  // Check they're not trying to delete the permanent admin
+  const target = await User.findById(req.params.id);
+  if (!target) return error(res, 'User not found', 404);
+  if (target.email === 'confidencerich97@gmail.com') return error(res, 'This admin account is permanent and cannot be deleted', 403);
+  await db.query('DELETE FROM users WHERE id=$1', [req.params.id]);
+  return success(res, null, 'User deleted');
+};
+
 // ── SITES ─────────────────────────────────────────────────────
 exports.getPendingSites = async (_req, res) => {
   const { rows } = await db.query(
