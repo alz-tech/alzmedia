@@ -139,6 +139,8 @@ exports.updateBank = async (req, res) => {
 };
 
 exports.requestWithdrawal = async (req, res) => {
+  if (!Paystack.isConfigured())
+    return error(res, 'Withdrawals are temporarily unavailable. Payment system not yet configured.', 503);
   const pub = await getPublisher(req.user.id);
   if (!pub) return error(res, 'Publisher profile not found', 404);
 
@@ -191,11 +193,13 @@ exports.requestWithdrawal = async (req, res) => {
 };
 
 exports.getBanks = async (_req, res) => {
+  if (!Paystack.isConfigured()) return success(res, [], 'Payment system not configured');
   const banks = await Paystack.listBanks();
   return success(res, banks);
 };
 
 exports.resolveAccount = async (req, res) => {
+  if (!Paystack.isConfigured()) return error(res, 'Payment system not configured', 503);
   const { account_number, bank_code } = req.body;
   if (!account_number || !bank_code) return error(res, 'account_number and bank_code required');
   const data = await Paystack.resolveAccount({ account_number, bank_code });

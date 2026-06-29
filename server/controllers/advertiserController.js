@@ -22,6 +22,8 @@ exports.getStats = async (req, res) => {
 
 // ── WALLET ────────────────────────────────────────────────────
 exports.fundWallet = async (req, res) => {
+  if (!Paystack.isConfigured())
+    return error(res, 'Wallet funding is temporarily unavailable. Payment system not yet configured.', 503);
   const adv = await getAdvertiser(req.user.id);
   if (!adv) return error(res, 'Advertiser profile not found', 404);
 

@@ -1,8 +1,10 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL:         import.meta.env.VITE_API_URL || 'https://api.alz.name.ng',
-  withCredentials: true,  // httpOnly cookie sent automatically
+  // Same origin — frontend and backend on same Render service
+  // In dev, Vite proxy forwards /api to localhost:3000
+  baseURL:         '/api',
+  withCredentials: true,
   headers:         { 'Content-Type': 'application/json' },
 });
 
