@@ -1,23 +1,27 @@
+/* ── LAYOUT ── */
 .dashboard-layout {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
   background: var(--bg);
 }
 
 .dashboard-main {
-  margin-left: 240px;
   flex: 1;
-  padding: 36px 40px;
+  padding: 28px 28px 40px;
   max-width: 1200px;
-  min-height: 100vh;
+  width: 100%;
+  margin: 0 auto;
+  padding-top: calc(var(--nav-height) + 28px);
 }
 
+/* ── PAGE STRUCTURE ── */
 .page-header {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 .page-title {
   font-family: var(--font-display);
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
   letter-spacing: -0.8px;
   color: var(--text);
@@ -27,16 +31,18 @@
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
 }
 
+/* ── CARD ── */
 .card {
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 24px;
+  padding: 22px;
+  transition: border-color 0.2s;
 }
 .card-title {
   font-family: var(--font-display);
@@ -46,6 +52,7 @@
   color: var(--text);
 }
 
+/* ── FORM COMPONENTS ── */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -66,7 +73,7 @@
   color: var(--text);
   width: 100%;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background 0.2s;
 }
 .form-input:focus, .form-select:focus, .form-textarea:focus {
   border-color: var(--purple);
@@ -75,6 +82,7 @@
 .form-select { appearance: none; cursor: pointer; }
 .form-textarea { resize: vertical; min-height: 90px; }
 
+/* ── BUTTONS ── */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -88,6 +96,7 @@
   border: none;
   transition: background 0.15s, transform 0.1s, box-shadow 0.15s, opacity 0.15s;
   letter-spacing: -0.2px;
+  cursor: pointer;
 }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn:active:not(:disabled) { transform: translateY(1px); }
@@ -109,6 +118,11 @@
 .btn-sm { padding: 7px 14px; font-size: 13px; }
 .btn-full { width: 100%; }
 
-@media (max-width: 900px) {
-  .dashboard-main { margin-left: 0; padding: 20px 16px; }
+@media (max-width: 768px) {
+  .dashboard-main { padding: 16px 16px 32px; padding-top: calc(var(--nav-height) + 16px); }
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .page-title { font-size: 20px; }
+}
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr; }
 }

@@ -198,3 +198,27 @@ CREATE INDEX idx_ad_slots_site           ON ad_slots(site_id);
 CREATE INDEX idx_publisher_sites_pub     ON publisher_sites(publisher_id);
 CREATE INDEX idx_users_email             ON users(email);
 CREATE INDEX idx_withdrawals_publisher   ON withdrawals(publisher_id);
+
+-- ── EMAIL VERIFICATION CODES ────────────────────────────────
+CREATE TABLE IF NOT EXISTS email_verifications (
+  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id     UUID REFERENCES users(id) ON DELETE CASCADE,
+  code        VARCHAR(6) NOT NULL,
+  expires_at  TIMESTAMP NOT NULL,
+  used        BOOLEAN DEFAULT FALSE,
+  created_at  TIMESTAMP DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_email_verifications_user ON email_verifications(user_id);
+
+-- ── USER ONBOARDING EXTRAS ──────────────────────────────────
+ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_status VARCHAR(20) DEFAULT 'none'
+  CHECK (verification_status IN ('none','pending','approved','rejected'));
+ALTER TABLE users ADD COLUMN IF NOT EXISTS id_doc_telegram_id TEXT;
+ALTER TABLE publishers ADD COLUMN IF NOT EXISTS site_name VARCHAR(255);
+ALTER TABLE publishers ADD COLUMN IF NOT EXISTS platform_type VARCHAR(30);
+ALTER TABLE publishers ADD COLUMN IF NOT EXISTS traffic_estimate VARCHAR(50);
+ALTER TABLE publishers ADD COLUMN IF NOT EXISTS content_category VARCHAR(100);
+ALTER TABLE advertisers ADD COLUMN IF NOT EXISTS company_name VARCHAR(255);
+ALTER TABLE advertisers ADD COLUMN IF NOT EXISTS industry VARCHAR(100);
+ALTER TABLE advertisers ADD COLUMN IF NOT EXISTS budget_range VARCHAR(50);
+ALTER TABLE advertisers ADD COLUMN IF NOT EXISTS what_to_advertise TEXT;
