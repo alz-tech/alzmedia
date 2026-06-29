@@ -1,4 +1,5 @@
-const { getClient } = require('../config/telegram');
+const { getClient, isConfigured } = require('../config/telegram');
+
 const { Api }       = require('telegram');
 const fs            = require('fs');
 const path          = require('path');
@@ -10,6 +11,7 @@ const CHANNEL_ID = BigInt(process.env.TELEGRAM_CHANNEL_ID);
  * Returns { file_id, file_url }
  */
 async function uploadToTelegram(fileBuffer, filename, mimeType) {
+  if (!isConfigured()) throw new Error('Telegram not configured. Cannot upload media.');
   const client = await getClient();
 
   const ext       = path.extname(filename);
