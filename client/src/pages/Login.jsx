@@ -6,8 +6,8 @@ import api from '../services/api';
 import './Auth.css';
 
 export default function Login({ role }) {
-  const navigate       = useNavigate();
-  const { login }      = useAuth();
+  const navigate           = useNavigate();
+  const { login }          = useAuth();
   const { success, error } = useToast();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ email: '', password: '' });
@@ -19,15 +19,19 @@ export default function Login({ role }) {
     if (!form.email || !form.password) return error('Email and password are required');
     setLoading(true);
     try {
-      const res = await api.post('/auth/login', { ...form });
+      const res  = await api.post('/auth/login', form);
       const user = res.data.data.user;
-      if (user.role !== role) {
-        error(`This account is registered as a ${user.role}. Please use the correct login.`);
-        return;
-      }
+
+      // Set user in context first
       login(user);
       success('Welcome back!');
-      navigate(`/${user.role}`);
+
+      // Redirect based on actual role returned from server
+      if (user.role === 'admin') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate(`/${user.role}`, { replace: true });
+      }
     } catch (err) {
       error(err.response?.data?.message || 'Login failed. Please try again.');
     } finally {
@@ -53,13 +57,17 @@ export default function Login({ role }) {
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-group">
             <label className="form-label" htmlFor="email">Email address</label>
-            <input id="email" type="email" className="form-input" placeholder="you@example.com"
-              value={form.email} onChange={set('email')} autoComplete="email" required />
+            <input id="email" type="email" className="form-input"
+              placeholder="you@example.com"
+              value={form.email} onChange={set('email')}
+              autoComplete="email" required />
           </div>
           <div className="form-group">
             <label className="form-label" htmlFor="password">Password</label>
-            <input id="password" type="password" className="form-input" placeholder="••••••••"
-              value={form.password} onChange={set('password')} autoComplete="current-password" required />
+            <input id="password" type="password" className="form-input"
+              placeholder="••••••••"
+              value={form.password} onChange={set('password')}
+              autoComplete="current-password" required />
           </div>
 
           <button type="submit" className="btn btn-primary btn-full auth-submit" disabled={loading}>
@@ -73,6 +81,11 @@ export default function Login({ role }) {
         </p>
         <p className="auth-switch">
           Are you a <Link to={`/${other}/login`}>{other}</Link>?
+        </p>
+
+        {/* Admin hint */}
+        <p className="auth-switch" style={{ marginTop: 24, fontSize: 12, color: 'var(--text-dim)' }}>
+          Admin? Use either login page with your admin email.
         </p>
       </div>
     </div>

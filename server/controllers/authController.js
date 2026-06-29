@@ -6,19 +6,23 @@ const { signAccess, signRefresh, verifyRefresh } = require('../utils/jwt');
 const { generatePublisherId, generateAdvertiserId } = require('../utils/generateId');
 const { success, error } = require('../utils/response');
 
-const COOKIE_OPTS = {
-  httpOnly: true,
-  secure:   process.env.NODE_ENV === 'production',
-  sameSite: 'strict',
-  maxAge:   7 * 24 * 60 * 60 * 1000, // 7d
-};
+const isProd = process.env.NODE_ENV === 'production';
 
-function issueTokens(res, payload) {
-  const access  = signAccess(payload);
-  const refresh = signRefresh(payload);
-  res.cookie('access_token',  access,  { ...COOKIE_OPTS, maxAge: 15 * 60 * 1000 });
-  res.cookie('refresh_token', refresh, COOKIE_OPTS);
-  return { access, refresh };
+function setCookies(res, accessToken, refreshToken) {
+  res.cookie('access_token', accessToken, {
+    httpOnly: true,
+    secure:   isProd,
+    sameSite: isProd ? 'none' : 'lax', // 'none' needed for cross-origin, 'lax' for local dev
+    maxAge:   15 * 60 * 1000,          // 15 minutes
+    path:     '/',
+  });
+  res.cookie('refresh_token', refreshToken, {
+    httpOnly: true,
+    secure:   isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    maxAge:   7 * 24 * 60 * 60 * 1000, // 7 days
+    path:     '/',
+  });
 }
 
 exports.register = async (req, res) => {
@@ -43,11 +47,15 @@ exports.register = async (req, res) => {
     await Advertiser.create({ user_id: user.id, advertiser_id: generateAdvertiserId() });
   }
 
-  const { access } = issueTokens(res, { id: user.id, role: user.role });
-  await User.setRefreshToken(user.id, signRefresh({ id: user.id, role: user.role }));
+  const accessToken  = signAccess({ id: user.id, role: user.role });
+  const refreshToken = signRefresh({ id: user.id, role: user.role });
 
-  return success(res, { user: { id: user.id, email: user.email, full_name: user.full_name, role: user.role } },
-    'Account created', 201);
+  setCookies(res, accessToken, refreshToken);
+  await User.setRefreshToken(user.id, refreshToken);
+
+  return success(res, {
+    user: { id: user.id, email: user.email, full_name: user.full_name, role: user.role }
+  }, 'Account created', 201);
 };
 
 exports.login = async (req, res) => {
@@ -55,17 +63,22 @@ exports.login = async (req, res) => {
   if (!email || !password) return error(res, 'Email and password required');
 
   const user = await User.findByEmail(email);
-  if (!user) return error(res, 'Invalid credentials', 401);
+  if (!user)         return error(res, 'Invalid credentials', 401);
   if (user.is_banned) return error(res, 'Your account has been suspended', 403);
 
   const valid = await comparePassword(password, user.password);
   if (!valid) return error(res, 'Invalid credentials', 401);
 
-  issueTokens(res, { id: user.id, role: user.role });
-  await User.setRefreshToken(user.id, signRefresh({ id: user.id, role: user.role }));
+  const accessToken  = signAccess({ id: user.id, role: user.role });
+  const refreshToken = signRefresh({ id: user.id, role: user.role });
+
+  setCookies(res, accessToken, refreshToken);
+  await User.setRefreshToken(user.id, refreshToken);
   await User.updateLastLogin(user.id);
 
-  return success(res, { user: { id: user.id, email: user.email, full_name: user.full_name, role: user.role } }, 'Login successful');
+  return success(res, {
+    user: { id: user.id, email: user.email, full_name: user.full_name, role: user.role }
+  }, 'Login successful');
 };
 
 exports.refresh = async (req, res) => {
@@ -77,7 +90,10 @@ exports.refresh = async (req, res) => {
     const user    = await User.findById(decoded.id);
     if (!user || user.is_banned) return error(res, 'Unauthorized', 401);
 
-    issueTokens(res, { id: user.id, role: user.role });
+    const accessToken  = signAccess({ id: user.id, role: user.role });
+    const refreshToken = signRefresh({ id: user.id, role: user.role });
+
+    setCookies(res, accessToken, refreshToken);
     return success(res, null, 'Token refreshed');
   } catch {
     return error(res, 'Invalid refresh token', 401);
@@ -86,8 +102,8 @@ exports.refresh = async (req, res) => {
 
 exports.logout = async (req, res) => {
   await User.clearRefreshToken(req.user.id);
-  res.clearCookie('access_token');
-  res.clearCookie('refresh_token');
+  res.clearCookie('access_token',  { path: '/', sameSite: isProd ? 'none' : 'lax', secure: isProd });
+  res.clearCookie('refresh_token', { path: '/', sameSite: isProd ? 'none' : 'lax', secure: isProd });
   return success(res, null, 'Logged out');
 };
 

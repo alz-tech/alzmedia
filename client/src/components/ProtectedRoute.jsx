@@ -4,15 +4,48 @@ import { useAuth } from '../hooks/useAuth';
 export default function ProtectedRoute({ children, role }) {
   const { user, loading } = useAuth();
 
-  if (loading) return (
-    <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100vh', background:'var(--bg)' }}>
-      <div className="spinner" style={{ width:28, height:28, borderWidth:3 }} />
-    </div>
-  );
+  // Still checking auth — show nothing yet, don't redirect
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        background: '#07070D',
+        flexDirection: 'column',
+        gap: 16,
+      }}>
+        <div style={{
+          fontFamily: 'sans-serif',
+          fontSize: 24,
+          fontWeight: 700,
+          letterSpacing: -1,
+        }}>
+          <span style={{ color: '#9D5FF5' }}>Alz</span>
+          <span style={{ color: '#F4F4FF' }}>Media</span>
+        </div>
+        <div style={{
+          width: 24,
+          height: 24,
+          border: '2px solid #1E1E30',
+          borderTopColor: '#7C3AED',
+          borderRadius: '50%',
+          animation: 'spin 0.7s linear infinite',
+        }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
 
+  // Not logged in → home
   if (!user) return <Navigate to="/" replace />;
-  if (role && user.role !== role && user.role !== 'admin')
-    return <Navigate to="/" replace />;
+
+  // Wrong role — but admin can access everything
+  if (role && user.role !== role && user.role !== 'admin') {
+    // Redirect to their own dashboard
+    return <Navigate to={`/${user.role}`} replace />;
+  }
 
   return children;
 }
