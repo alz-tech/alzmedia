@@ -73,7 +73,7 @@ export default function Withdraw() {
         <p className="page-subtitle">Withdraw your earnings to your Nigerian bank account</p>
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+      <div className="card-grid-2">
         {/* Bank Details */}
         <div className="card">
           <div className="card-title">Bank Details</div>
@@ -95,9 +95,9 @@ export default function Withdraw() {
               }}
               onBlur={resolveAccount} />
           </div>
-          {resolving && <p style={{ fontSize:13, color:'var(--text-muted)' }}>Resolving account...</p>}
+          {resolving && <p style={{ fontSize:13, color:'var(--text-muted)', marginBottom:16 }}>Resolving account...</p>}
           {accountName && (
-            <div style={{ background:'var(--green-dim)', border:'1px solid var(--green-border)', borderRadius:'var(--radius)', padding:'10px 14px', fontSize:13, color:'var(--green)', marginBottom:16 }}>
+            <div className="info-box info-box--success">
               {accountName}
             </div>
           )}
@@ -109,9 +109,9 @@ export default function Withdraw() {
         {/* Withdraw */}
         <div className="card">
           <div className="card-title">Request Withdrawal</div>
-          <div style={{ background:'var(--bg3)', borderRadius:'var(--radius)', padding:'14px 16px', marginBottom:20 }}>
-            <div style={{ fontSize:12, color:'var(--text-muted)', marginBottom:4 }}>Available Balance</div>
-            <div style={{ fontFamily:'var(--font-display)', fontSize:28, fontWeight:700, letterSpacing:'-1px' }}>
+          <div className="balance-box">
+            <div className="balance-box-label">Available Balance</div>
+            <div className="balance-box-value">
               ₦{Number(stats?.wallet_balance || 0).toLocaleString()}
             </div>
           </div>

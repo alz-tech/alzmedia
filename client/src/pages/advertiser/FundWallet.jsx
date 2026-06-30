@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
-import Table from '../../components/Table';
+import DataList from '../../components/DataList';
 import { useToast } from '../../hooks/useToast';
 import api from '../../services/api';
 
@@ -50,11 +50,11 @@ export default function FundWallet() {
         <p className="page-subtitle">Fund your wallet to run campaigns</p>
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'340px 1fr', gap:20, alignItems:'start' }}>
+      <div className="wallet-layout">
         <div className="card">
-          <div style={{ background:'var(--bg3)', borderRadius:'var(--radius)', padding:'16px', marginBottom:20 }}>
-            <div style={{ fontSize:12, color:'var(--text-muted)', marginBottom:4 }}>Wallet Balance</div>
-            <div style={{ fontFamily:'var(--font-display)', fontSize:30, fontWeight:700, letterSpacing:'-1px' }}>
+          <div className="balance-box">
+            <div className="balance-box-label">Wallet Balance</div>
+            <div className="balance-box-value">
               ₦{Number(balance || 0).toLocaleString()}
             </div>
           </div>
@@ -64,7 +64,7 @@ export default function FundWallet() {
               <input className="form-input" type="number" placeholder="Min. ₦500"
                 value={amount} onChange={e => setAmount(e.target.value)} min={500} />
             </div>
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8, marginBottom:16 }}>
+            <div className="quick-amount-row">
               {[1000,5000,10000].map(v => (
                 <button key={v} type="button" className="btn btn-ghost btn-sm" onClick={() => setAmount(String(v))}>
                   ₦{v.toLocaleString()}
@@ -79,7 +79,7 @@ export default function FundWallet() {
 
         <div className="card">
           <div className="card-title">Transaction History</div>
-          <Table columns={txColumns} data={txns} loading={balance === null} emptyMessage="No transactions yet." />
+          <DataList columns={txColumns} data={txns} loading={balance === null} emptyMessage="No transactions yet." />
         </div>
       </div>
     </DashboardLayout>

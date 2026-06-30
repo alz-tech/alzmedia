@@ -10,11 +10,16 @@ import '../publisher/Dashboard.css';
 const ICON_U = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>;
 const ICON_C = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>;
 
+const ICON_SITES_PEND     = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 3c-4 4-4 14 0 18m0-18c4 4 4 14 0 18M3 12h18"/></svg>;
+const ICON_CREATIVES_PEND = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h6M3 15h6"/></svg>;
+const ICON_CAMPAIGNS_PEND = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>;
+const ICON_PAYOUTS_PEND   = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>;
+
 const PENDING_LINKS = [
-  { key: 'pending_sites',       label: 'Sites',       icon: '🌐', to: '/admin/sites' },
-  { key: 'pending_creatives',   label: 'Creatives',   icon: '🎨', to: '/admin/creatives' },
-  { key: 'pending_campaigns',   label: 'Campaigns',   icon: '📣', to: '/admin/campaigns' },
-  { key: 'pending_withdrawals', label: 'Withdrawals', icon: '💸', to: '/admin/payouts' },
+  { key: 'pending_sites',       label: 'Sites',       icon: ICON_SITES_PEND,     to: '/admin/sites' },
+  { key: 'pending_creatives',   label: 'Creatives',   icon: ICON_CREATIVES_PEND, to: '/admin/creatives' },
+  { key: 'pending_campaigns',   label: 'Campaigns',   icon: ICON_CAMPAIGNS_PEND, to: '/admin/campaigns' },
+  { key: 'pending_withdrawals', label: 'Withdrawals', icon: ICON_PAYOUTS_PEND,   to: '/admin/payouts' },
 ];
 
 export default function AdminDashboard() {

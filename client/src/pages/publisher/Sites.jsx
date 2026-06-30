@@ -1,19 +1,31 @@
 import { useState, useEffect, useRef } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
-import Table from '../../components/Table';
+import DataList from '../../components/DataList';
 import { useToast } from '../../hooks/useToast';
 import api from '../../services/api';
 
-// Professional platform options with icons + descriptions
+// Real SVG icons for each platform type
+const PLATFORM_ICONS = {
+  website:    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 3c-4 4-4 14 0 18m0-18c4 4 4 14 0 18M3 12h18"/></svg>,
+  mobile_app: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4" strokeLinecap="round"/></svg>,
+  android:    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="5" y="7" width="14" height="13" rx="2"/><path d="M9 3l1.5 2.5M15 3l-1.5 2.5M5 12H3m18 0h-2" strokeLinecap="round"/><circle cx="9.5" cy="11.5" r="0.7" fill="currentColor" stroke="none"/><circle cx="14.5" cy="11.5" r="0.7" fill="currentColor" stroke="none"/></svg>,
+  ios:        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 19h4" strokeLinecap="round"/></svg>,
+  telegram:   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" strokeLinejoin="round" strokeLinecap="round"/></svg>,
+  whatsapp:   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M21 11.5a8.5 8.5 0 01-12.4 7.5L3 20l1.1-5.5A8.5 8.5 0 1121 11.5z" strokeLinejoin="round"/><path d="M8.5 9.5c0 3 2.5 5.5 5.5 5.5" strokeLinecap="round"/></svg>,
+  youtube:    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M10 9l5 3-5 3V9z" fill="currentColor" stroke="none"/></svg>,
+  other:      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>,
+};
+
+// Professional platform options
 const PLATFORMS = [
-  { value: 'website',     label: 'Website',      icon: '🌐', desc: 'A web-based site or blog' },
-  { value: 'mobile_app',  label: 'Mobile App',   icon: '📱', desc: 'iOS or Android application' },
-  { value: 'android',     label: 'Android App',  icon: '🤖', desc: 'Google Play / APK' },
-  { value: 'ios',         label: 'iOS App',      icon: '🍎', desc: 'App Store application' },
-  { value: 'telegram',    label: 'Telegram',     icon: '✈️', desc: 'Bot, channel or group' },
-  { value: 'whatsapp',    label: 'WhatsApp',     icon: '💬', desc: 'Channel or community' },
-  { value: 'youtube',     label: 'YouTube',      icon: '▶️', desc: 'Channel or video content' },
-  { value: 'other',       label: 'Other',        icon: '📦', desc: 'Any other platform' },
+  { value: 'website',     label: 'Website',      desc: 'A web-based site or blog' },
+  { value: 'mobile_app',  label: 'Mobile App',   desc: 'iOS or Android application' },
+  { value: 'android',     label: 'Android App',  desc: 'Google Play / APK' },
+  { value: 'ios',         label: 'iOS App',      desc: 'App Store application' },
+  { value: 'telegram',    label: 'Telegram',     desc: 'Bot, channel or group' },
+  { value: 'whatsapp',    label: 'WhatsApp',     desc: 'Channel or community' },
+  { value: 'youtube',     label: 'YouTube',      desc: 'Channel or video content' },
+  { value: 'other',       label: 'Other',        desc: 'Any other platform' },
 ];
 
 function PlatformSelect({ value, onChange }) {
@@ -39,7 +51,7 @@ function PlatformSelect({ value, onChange }) {
         tabIndex={0}
         onKeyDown={e => e.key === 'Enter' && setOpen(o => !o)}
       >
-        <span>{selected.icon}</span>
+        <span className="custom-select-icon">{PLATFORM_ICONS[selected.value]}</span>
         <span style={{ flex: 1, fontWeight: 500 }}>{selected.label}</span>
         <svg className="custom-select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/>
@@ -53,7 +65,7 @@ function PlatformSelect({ value, onChange }) {
               className={`custom-select-option${p.value === value ? ' selected' : ''}`}
               onClick={() => { onChange(p.value); setOpen(false); }}
             >
-              <span className="custom-select-option-icon">{p.icon}</span>
+              <span className="custom-select-option-icon">{PLATFORM_ICONS[p.value]}</span>
               <div>
                 <div className="custom-select-option-label">{p.label}</div>
                 <div className="custom-select-option-desc">{p.desc}</div>
@@ -116,7 +128,6 @@ export default function Sites() {
   }
 
   const getPlatformLabel = (val) => PLATFORMS.find(p => p.value === val)?.label || val;
-  const getPlatformIcon  = (val) => PLATFORMS.find(p => p.value === val)?.icon || '📦';
 
   const statusBadge = (s) => <span className={`badge badge-${s}`}>{s}</span>;
 
@@ -124,7 +135,8 @@ export default function Sites() {
     { key: 'name',          label: 'Name' },
     { key: 'platform_type', label: 'Platform', render: v => (
       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
-        {getPlatformIcon(v)} {getPlatformLabel(v)}
+        <span style={{ display: 'inline-flex', width: 15, height: 15 }}>{PLATFORM_ICONS[v]}</span>
+        {getPlatformLabel(v)}
       </span>
     )},
     { key: 'url', label: 'URL', render: v => v
@@ -132,7 +144,7 @@ export default function Sites() {
       : <span style={{ color: 'var(--text-dim)' }}>—</span>
     },
     { key: 'status', label: 'Status', render: statusBadge },
-    { key: 'id', label: '', width: 90, render: (_, row) => row.status === 'pending'
+    { key: 'id', label: 'Action', actions: true, render: (_, row) => row.status === 'pending'
         ? <button className="btn btn-danger btn-sm" onClick={() => handleDelete(row.id)}>Remove</button>
         : null
     },
@@ -140,8 +152,8 @@ export default function Sites() {
 
   return (
     <DashboardLayout>
-      <div className="page-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-        <div>
+      <div className="page-header-row">
+        <div className="page-header">
           <h1 className="page-title">My Sites</h1>
           <p className="page-subtitle">Manage your registered websites and apps</p>
         </div>
@@ -154,7 +166,7 @@ export default function Sites() {
         <div className="card" style={{ marginBottom: 28 }}>
           <div className="card-title">Add New Site / App</div>
           <form onSubmit={handleAdd}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
+            <div className="form-grid-2">
               <div className="form-group">
                 <label className="form-label">Name *</label>
                 <input className="form-input" placeholder="My Blog" value={form.name} onChange={set('name')} required />
@@ -179,7 +191,7 @@ export default function Sites() {
         </div>
       )}
 
-      <Table
+      <DataList
         columns={columns}
         data={sites}
         loading={loading}

@@ -1,0 +1,133 @@
+/* ══════════════════════════════════════
+   DATA LIST — responsive table/card component
+   ══════════════════════════════════════ */
+
+.dl-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 48px 16px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.dl-empty {
+  text-align: center;
+  padding: 40px 16px;
+  color: var(--text-muted);
+  font-size: 14px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+/* ── DESKTOP TABLE ── */
+.dl-table-wrap {
+  display: none;
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--bg2);
+}
+.dl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.dl-table thead th {
+  background: var(--bg3);
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.dl-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+}
+.dl-table tbody tr:last-child { border-bottom: none; }
+.dl-table tbody tr:hover { background: var(--bg3); }
+.dl-table tbody td {
+  padding: 13px 16px;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+/* ── MOBILE CARDS ── */
+.dl-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dl-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+
+.dl-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: var(--font-display);
+  letter-spacing: -0.2px;
+  margin-bottom: 10px;
+  word-break: break-word;
+}
+
+.dl-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+.dl-card-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  font-size: 13px;
+}
+.dl-card-label {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  font-weight: 400;
+}
+.dl-card-value {
+  color: var(--text);
+  font-weight: 500;
+  text-align: right;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.dl-card-actions {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dl-card-actions .btn { flex: 1; min-width: fit-content; }
+.dl-card-actions .form-input { width: 100% !important; flex-basis: 100%; }
+
+/* ── BREAKPOINT SWITCH ── */
+/* Below 760px: show cards, hide table.
+   At/above 760px: show table, hide cards. */
+@media (min-width: 760px) {
+  .dl-table-wrap { display: block; }
+  .dl-cards      { display: none; }
+}

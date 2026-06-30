@@ -38,7 +38,6 @@
 }
 
 .action-icon {
-  font-size: 18px;
   flex-shrink: 0;
   width: 32px;
   height: 32px;
@@ -48,12 +47,17 @@
   background: var(--bg3);
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
+  color: var(--text-muted);
 }
+.action-icon svg { width: 16px; height: 16px; }
 .action-item--primary .action-icon {
   background: var(--purple-dim);
   border-color: var(--purple-border);
+  color: var(--purple-lt);
 }
-
+.action-item--alert .action-icon {
+  color: var(--yellow);
+}
 .action-body {
   flex: 1;
   min-width: 0;

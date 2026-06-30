@@ -50,7 +50,7 @@ export default function CreateCampaign() {
             <input className="form-input" placeholder="My Naija Campaign" value={form.name} onChange={set('name')} required />
           </div>
 
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+          <div className="form-grid-2">
             <div className="form-group">
               <label className="form-label">Total Budget (₦) *</label>
               <input className="form-input" type="number" placeholder="5000" min={500}
@@ -92,7 +92,7 @@ export default function CreateCampaign() {
             </div>
           </div>
 
-          <div style={{ display:'flex', gap:12, marginTop:8 }}>
+          <div className="form-btn-row">
             <button type="submit" className="btn btn-primary" disabled={loading}>
               {loading ? <span className="spinner" /> : 'Create Campaign'}
             </button>

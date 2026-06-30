@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
-import Table from '../../components/Table';
+import DataList from '../../components/DataList';
 import { useToast } from '../../hooks/useToast';
 import api from '../../services/api';
 
@@ -71,20 +71,20 @@ export default function Slots() {
     { key:'slot_type', label:'Type' },
     { key:'size',      label:'Size', render: v => v || '—' },
     { key:'is_active', label:'Status', render: v => <span className={`badge ${v ? 'badge-active' : 'badge-paused'}`}>{v ? 'Active' : 'Paused'}</span> },
-    { key:'id',        label:'', width:160, render:(_,row) => (
-      <div style={{ display:'flex', gap:8 }}>
+    { key:'id', label:'Action', actions: true, render:(_,row) => (
+      <>
         <button className="btn btn-ghost btn-sm" onClick={() => toggleSlot(row.id)}>
           {row.is_active ? 'Pause' : 'Activate'}
         </button>
         <button className="btn btn-danger btn-sm" onClick={() => deleteSlot(row.id)}>Delete</button>
-      </div>
+      </>
     )},
   ];
 
   return (
     <DashboardLayout>
-      <div className="page-header" style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between' }}>
-        <div>
+      <div className="page-header-row">
+        <div className="page-header">
           <h1 className="page-title">Ad Slots</h1>
           <p className="page-subtitle">Create and manage ad slots for your approved sites</p>
         </div>
@@ -94,16 +94,16 @@ export default function Slots() {
       </div>
 
       {!sites.length && !loading && (
-        <div className="card" style={{ marginBottom:24, textAlign:'center', padding:'32px', color:'var(--text-muted)' }}>
+        <div className="card section-gap" style={{ textAlign:'center', color:'var(--text-muted)' }}>
           You need at least one approved site before creating ad slots.
         </div>
       )}
 
       {showForm && (
-        <div className="card" style={{ marginBottom:24 }}>
+        <div className="card section-gap">
           <div className="card-title">Create Ad Slot</div>
           <form onSubmit={handleCreate}>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+            <div className="form-grid-2">
               <div className="form-group">
                 <label className="form-label">Site *</label>
                 <select className="form-select" value={form.site_id} onChange={set('site_id')} required>
@@ -135,7 +135,7 @@ export default function Slots() {
         </div>
       )}
 
-      <Table columns={columns} data={slots} loading={loading} emptyMessage="No ad slots yet." />
+      <DataList columns={columns} data={slots} loading={loading} emptyMessage="No ad slots yet." />
     </DashboardLayout>
   );
 }
