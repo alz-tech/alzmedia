@@ -45,14 +45,14 @@ export default function AdminSettings() {
         {loading
           ? <div style={{ color:'var(--text-muted)', fontSize:14 }}>Loading settings...</div>
           : Object.entries(LABELS).map(([key, label]) => (
-              <div key={key} style={{ display:'flex', alignItems:'center', gap:12, marginBottom:16 }}>
+              <div key={key} className="settings-row">
                 <div className="form-group" style={{ flex:1, marginBottom:0 }}>
                   <label className="form-label">{label}</label>
                   <input className="form-input" type="number"
                     value={settings[key] || ''}
                     onChange={e => setSettings(p => ({ ...p, [key]: e.target.value }))} />
                 </div>
-                <button className="btn btn-primary btn-sm" style={{ marginTop:20 }}
+                <button className="btn btn-primary btn-sm settings-save-btn"
                   onClick={() => save(key)} disabled={saving[key]}>
                   {saving[key] ? <span className="spinner" style={{ width:14, height:14, borderWidth:2 }} /> : 'Save'}
                 </button>

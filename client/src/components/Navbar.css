@@ -120,10 +120,8 @@
 .navbar-menu-inner {
   background: var(--bg2);
   border-bottom: 1px solid var(--border);
-  padding: 16px 20px 24px;
-  max-width: 420px;
-  margin-left: auto;
-  margin-right: 20px;
+  padding: 16px 16px 20px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -133,12 +131,22 @@
   transition: transform 0.28s cubic-bezier(.22,1,.36,1), opacity 0.2s ease;
   max-height: calc(100vh - var(--nav-height));
   overflow-y: auto;
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-  box-shadow: 0 12px 40px #00000030;
+  box-shadow: 0 12px 30px #00000014;
 }
 .navbar-menu.open .navbar-menu-inner {
   transform: translateY(0);
   opacity: 1;
+}
+
+@media (min-width: 640px) {
+  .navbar-menu-inner {
+    max-width: 380px;
+    margin-left: auto;
+    margin-right: 16px;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
 }
 
 /* Section label */
@@ -193,9 +201,9 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 11px 12px;
+  padding: 13px 12px;
   border-radius: var(--radius);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   color: var(--text-muted);
   transition: background 0.12s, color 0.12s;

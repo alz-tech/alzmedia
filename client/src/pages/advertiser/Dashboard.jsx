@@ -15,11 +15,16 @@ const ICONS = {
   active:   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>,
 };
 
+const ICON_CAMPAIGNS_LIST = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>;
+const ICON_CREATE_CAMP    = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M12 5v14m-7-7h14" strokeLinecap="round"/></svg>;
+const ICON_FUND           = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="2" y="5" width="20" height="15" rx="2"/><path d="M16 12h.01M2 10h20"/></svg>;
+const ICON_ANALYTICS_2    = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-8"/></svg>;
+
 const QUICK_ACTIONS = [
-  { to: '/advertiser/campaigns',     label: 'My Campaigns',     icon: '📣', desc: 'View all campaigns' },
-  { to: '/advertiser/campaigns/new', label: 'Create Campaign',  icon: '✨', desc: 'Launch a new ad', primary: true },
-  { to: '/advertiser/wallet',        label: 'Fund Wallet',      icon: '💳', desc: 'Top up your balance' },
-  { to: '/advertiser/analytics',     label: 'Analytics',        icon: '📊', desc: 'Track performance' },
+  { to: '/advertiser/campaigns',     label: 'My Campaigns',     icon: ICON_CAMPAIGNS_LIST, desc: 'View all campaigns' },
+  { to: '/advertiser/campaigns/new', label: 'Create Campaign',  icon: ICON_CREATE_CAMP,    desc: 'Launch a new ad', primary: true },
+  { to: '/advertiser/wallet',        label: 'Fund Wallet',      icon: ICON_FUND,           desc: 'Top up your balance' },
+  { to: '/advertiser/analytics',     label: 'Analytics',        icon: ICON_ANALYTICS_2,    desc: 'Track performance' },
 ];
 
 export default function AdvertiserDashboard() {

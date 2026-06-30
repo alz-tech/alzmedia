@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
-import Table from '../../components/Table';
+import DataList from '../../components/DataList';
 import { useToast } from '../../hooks/useToast';
 import api from '../../services/api';
 
@@ -35,7 +35,7 @@ export default function AdminPayouts() {
     { key:'account_name',   label:'Account Name' },
     { key:'status',         label:'Status', render: v => <span className={`badge badge-${v==='success'?'active':v==='failed'?'rejected':'pending'}`}>{v}</span> },
     { key:'created_at',     label:'Date',   render: v => new Date(v).toLocaleDateString() },
-    { key:'id', label:'', width:120, render:(_,row) => row.status === 'pending'
+    { key:'id', label:'Action', actions: true, render:(_,row) => row.status === 'pending'
         ? <button className="btn btn-primary btn-sm" onClick={() => markProcessed(row.id)}>Mark Done</button>
         : null },
   ];
@@ -43,12 +43,12 @@ export default function AdminPayouts() {
   return (
     <DashboardLayout>
       <div className="page-header"><h1 className="page-title">Payouts</h1></div>
-      <div style={{ display:'flex', gap:10, marginBottom:20 }}>
+      <div className="filter-pill-row">
         {['pending','processing','success','failed'].map(s => (
-          <button key={s} className={`btn btn-sm ${status===s?'btn-primary':'btn-ghost'}`} onClick={() => setStatus(s)}>{s}</button>
+          <button key={s} className={`filter-pill ${status===s ? 'active' : ''}`} onClick={() => setStatus(s)}>{s}</button>
         ))}
       </div>
-      <Table columns={columns} data={payouts} loading={loading} emptyMessage="No payouts found." />
+      <DataList columns={columns} data={payouts} loading={loading} emptyMessage="No payouts found." />
     </DashboardLayout>
   );
 }

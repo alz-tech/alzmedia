@@ -18,8 +18,6 @@ const ICONS = {
   logout:    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>,
   creatives: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h6M3 15h6"/></svg>,
   payouts:   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>,
-  sun:       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>,
-  moon:      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>,
   switch:    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>,
 };
 
@@ -55,28 +53,11 @@ const ADMIN_VIEWS = {
   advertiser: { label: 'Advertiser View', links: NAV.advertiser },
 };
 
-function useTheme() {
-  const [theme, setTheme] = useState(() => {
-    const stored = localStorage.getItem('alzmedia-theme');
-    if (stored) return stored;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  });
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('alzmedia-theme', theme);
-  }, [theme]);
-
-  const toggle = () => setTheme(t => t === 'dark' ? 'light' : 'dark');
-  return { theme, toggle };
-}
-
 export default function Navbar() {
   const { user, logout }    = useAuth();
   const navigate             = useNavigate();
   const location             = useLocation();
   const { error }            = useToast();
-  const { theme, toggle }    = useTheme();
   const [open, setOpen]      = useState(false);
   const [adminView, setAdminView] = useState('admin'); // session-only, resets on remount
   const menuRef              = useRef(null);
@@ -118,11 +99,6 @@ export default function Navbar() {
           </a>
 
           <div className="navbar-right">
-            {/* Theme toggle */}
-            <button className="navbar-icon-btn" onClick={toggle} aria-label="Toggle theme">
-              {theme === 'dark' ? ICONS.sun : ICONS.moon}
-            </button>
-
             {user && (
               <div className="navbar-avatar" title={user.full_name}>
                 {user.full_name?.[0]?.toUpperCase()}

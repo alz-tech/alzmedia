@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import DashboardLayout from '../../components/DashboardLayout';
-import Table from '../../components/Table';
+import DataList from '../../components/DataList';
 import { useToast } from '../../hooks/useToast';
 import api from '../../services/api';
 
@@ -38,8 +38,8 @@ export default function Campaigns() {
     { key:'budget',      label:'Budget', render: v => `₦${Number(v).toLocaleString()}` },
     { key:'spent',       label:'Spent',  render: v => `₦${Number(v).toLocaleString()}` },
     { key:'status',      label:'Status', render: v => <span className={`badge badge-${v}`}>{v}</span> },
-    { key:'id',          label:'', width:220, render:(_,row) => (
-      <div style={{ display:'flex', gap:8 }}>
+    { key:'id', label:'Action', actions: true, render:(_,row) => (
+      <>
         <Link className="btn btn-ghost btn-sm" to={`/advertiser/campaigns/${row.id}/analytics`}>Analytics</Link>
         <Link className="btn btn-ghost btn-sm" to={`/advertiser/campaigns/${row.id}/creatives`}>Creatives</Link>
         {['active','paused'].includes(row.status) && (
@@ -47,20 +47,20 @@ export default function Campaigns() {
             {row.status === 'active' ? 'Pause' : 'Resume'}
           </button>
         )}
-      </div>
+      </>
     )},
   ];
 
   return (
     <DashboardLayout>
-      <div className="page-header" style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-        <div>
+      <div className="page-header-row">
+        <div className="page-header">
           <h1 className="page-title">Campaigns</h1>
           <p className="page-subtitle">Manage your ad campaigns</p>
         </div>
         <Link className="btn btn-primary" to="/advertiser/campaigns/new">+ New Campaign</Link>
       </div>
-      <Table columns={columns} data={campaigns} loading={loading} emptyMessage="No campaigns yet. Create your first campaign." />
+      <DataList columns={columns} data={campaigns} loading={loading} emptyMessage="No campaigns yet. Create your first campaign." />
     </DashboardLayout>
   );
 }

@@ -4,6 +4,28 @@ import DashboardLayout from '../../components/DashboardLayout';
 import { useToast } from '../../hooks/useToast';
 import api from '../../services/api';
 
+function MiniSeries({ title, rows, emptyText }) {
+  return (
+    <div className="card">
+      <div className="card-title">{title}</div>
+      {!rows?.length
+        ? <p style={{ fontSize:14, color:'var(--text-muted)' }}>{emptyText}</p>
+        : <div className="summary-list">
+            {rows.map(r => (
+              <div className="summary-row" key={r.date}>
+                <span className="summary-label">{new Date(r.date).toLocaleDateString()}</span>
+                <span className="summary-val" style={{ color: 'var(--green)' }}>
+                  {Number(r.count ?? r.valid ?? 0).toLocaleString()}
+                  {r.fraud > 0 && <span style={{ fontSize:11, color:'var(--red)', marginLeft:6, fontWeight:400 }}>+{r.fraud} fraud</span>}
+                </span>
+              </div>
+            ))}
+          </div>
+      }
+    </div>
+  );
+}
+
 export default function Analytics() {
   const { id }             = useParams();
   const { error }          = useToast();
@@ -18,7 +40,7 @@ export default function Analytics() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <DashboardLayout><div style={{ padding:40, color:'var(--text-muted)' }}>Loading analytics...</div></DashboardLayout>;
+  if (loading) return <DashboardLayout><div style={{ padding:'40px 0', color:'var(--text-muted)' }}>Loading analytics...</div></DashboardLayout>;
 
   const camp = data?.campaign;
 
@@ -29,44 +51,28 @@ export default function Analytics() {
         <p className="page-subtitle">Performance over the last 30 days</p>
       </div>
 
-      <div className="stats-grid" style={{ marginBottom:24 }}>
-        {[
-          { label:'Status',  val: <span className={`badge badge-${camp?.status}`}>{camp?.status}</span> },
-          { label:'Budget',  val: `₦${Number(camp?.budget||0).toLocaleString()}` },
-          { label:'Spent',   val: `₦${Number(camp?.spent||0).toLocaleString()}` },
-          { label:'Bid',     val: `₦${Number(camp?.bid_amount||0).toLocaleString()} ${camp?.bid_type?.toUpperCase()}` },
-        ].map(({ label, val }) => (
-          <div key={label} className="card" style={{ padding:'20px 24px' }}>
-            <div style={{ fontSize:12, color:'var(--text-muted)', marginBottom:8, textTransform:'uppercase', letterSpacing:'0.8px' }}>{label}</div>
-            <div style={{ fontFamily:'var(--font-display)', fontSize:20, fontWeight:700 }}>{val}</div>
-          </div>
-        ))}
+      <div className="stats-grid">
+        <div className="mini-stat-card">
+          <div className="mini-stat-label">Status</div>
+          <div className="mini-stat-val"><span className={`badge badge-${camp?.status}`}>{camp?.status}</span></div>
+        </div>
+        <div className="mini-stat-card">
+          <div className="mini-stat-label">Budget</div>
+          <div className="mini-stat-val">₦{Number(camp?.budget||0).toLocaleString()}</div>
+        </div>
+        <div className="mini-stat-card">
+          <div className="mini-stat-label">Spent</div>
+          <div className="mini-stat-val">₦{Number(camp?.spent||0).toLocaleString()}</div>
+        </div>
+        <div className="mini-stat-card">
+          <div className="mini-stat-label">Bid</div>
+          <div className="mini-stat-val">₦{Number(camp?.bid_amount||0).toLocaleString()} {camp?.bid_type?.toUpperCase()}</div>
+        </div>
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-        <div className="card">
-          <div className="card-title">Impressions</div>
-          {!data?.impressions?.length
-            ? <p style={{ fontSize:14, color:'var(--text-muted)' }}>No impressions yet</p>
-            : data.impressions.map(r => (
-                <div key={r.date} style={{ display:'flex', justifyContent:'space-between', fontSize:13, padding:'6px 0', borderBottom:'1px solid var(--border)' }}>
-                  <span style={{ color:'var(--text-muted)' }}>{new Date(r.date).toLocaleDateString()}</span>
-                  <span style={{ fontWeight:600 }}>{Number(r.count).toLocaleString()}</span>
-                </div>
-              ))}
-        </div>
-        <div className="card">
-          <div className="card-title">Clicks</div>
-          {!data?.clicks?.length
-            ? <p style={{ fontSize:14, color:'var(--text-muted)' }}>No clicks yet</p>
-            : data.clicks.map(r => (
-                <div key={r.date} style={{ display:'flex', justifyContent:'space-between', fontSize:13, padding:'6px 0', borderBottom:'1px solid var(--border)' }}>
-                  <span style={{ color:'var(--text-muted)' }}>{new Date(r.date).toLocaleDateString()}</span>
-                  <span style={{ fontWeight:600, color:'var(--green)' }}>{Number(r.valid).toLocaleString()}</span>
-                  {r.fraud > 0 && <span style={{ fontSize:11, color:'var(--red)' }}>+{r.fraud} fraud</span>}
-                </div>
-              ))}
-        </div>
+      <div className="card-grid-2">
+        <MiniSeries title="Impressions" rows={data?.impressions} emptyText="No impressions yet" />
+        <MiniSeries title="Clicks" rows={data?.clicks} emptyText="No clicks yet" />
       </div>
     </DashboardLayout>
   );

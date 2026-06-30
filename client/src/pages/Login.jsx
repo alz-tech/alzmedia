@@ -82,11 +82,6 @@ export default function Login({ role }) {
         <p className="auth-switch">
           Are you a <Link to={`/${other}/login`}>{other}</Link>?
         </p>
-
-        {/* Admin hint */}
-        <p className="auth-switch" style={{ marginTop: 24, fontSize: 12, color: 'var(--text-dim)' }}>
-          Admin? Use either login page with your admin email.
-        </p>
       </div>
     </div>
   );

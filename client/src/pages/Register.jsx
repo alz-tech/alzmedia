@@ -8,15 +8,26 @@ import './Register.css';
 
 const STEPS = ['Basic Info', 'Role Details', 'Verification', 'Terms', 'Verify Email'];
 
+const PLATFORM_ICONS = {
+  website:    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 3c-4 4-4 14 0 18m0-18c4 4 4 14 0 18M3 12h18"/></svg>,
+  mobile_app: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4" strokeLinecap="round"/></svg>,
+  android:    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="5" y="7" width="14" height="13" rx="2"/><path d="M9 3l1.5 2.5M15 3l-1.5 2.5M5 12H3m18 0h-2" strokeLinecap="round"/><circle cx="9.5" cy="11.5" r="0.7" fill="currentColor" stroke="none"/><circle cx="14.5" cy="11.5" r="0.7" fill="currentColor" stroke="none"/></svg>,
+  ios:        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 19h4" strokeLinecap="round"/></svg>,
+  telegram:   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" strokeLinejoin="round" strokeLinecap="round"/></svg>,
+  whatsapp:   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M21 11.5a8.5 8.5 0 01-12.4 7.5L3 20l1.1-5.5A8.5 8.5 0 1121 11.5z" strokeLinejoin="round"/><path d="M8.5 9.5c0 3 2.5 5.5 5.5 5.5" strokeLinecap="round"/></svg>,
+  youtube:    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M10 9l5 3-5 3V9z" fill="currentColor" stroke="none"/></svg>,
+  other:      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>,
+};
+
 const PLATFORMS = [
-  { value: 'website',    label: 'Website',     icon: '🌐' },
-  { value: 'mobile_app', label: 'Mobile App',  icon: '📱' },
-  { value: 'android',    label: 'Android App', icon: '🤖' },
-  { value: 'ios',        label: 'iOS App',     icon: '🍎' },
-  { value: 'telegram',   label: 'Telegram',    icon: '✈️' },
-  { value: 'whatsapp',   label: 'WhatsApp',    icon: '💬' },
-  { value: 'youtube',    label: 'YouTube',     icon: '▶️' },
-  { value: 'other',      label: 'Other',       icon: '📦' },
+  { value: 'website',    label: 'Website' },
+  { value: 'mobile_app', label: 'Mobile App' },
+  { value: 'android',    label: 'Android App' },
+  { value: 'ios',        label: 'iOS App' },
+  { value: 'telegram',   label: 'Telegram' },
+  { value: 'whatsapp',   label: 'WhatsApp' },
+  { value: 'youtube',    label: 'YouTube' },
+  { value: 'other',      label: 'Other' },
 ];
 const TRAFFIC_OPTIONS = ['Under 1,000/mo','1K–10K/mo','10K–50K/mo','50K–200K/mo','200K–1M/mo','1M+/mo'];
 const CONTENT_CATS    = ['News','Entertainment','Technology','Sports','Finance','Lifestyle','Education','Gaming','Other'];
@@ -248,7 +259,8 @@ export default function Register({ role }) {
                       <button key={p.value} type="button"
                         className={`reg-chip${form.platform_type === p.value ? ' active' : ''}`}
                         onClick={() => setF('platform_type', p.value)}>
-                        {p.icon} {p.label}
+                        <span className="reg-chip-icon">{PLATFORM_ICONS[p.value]}</span>
+                        {p.label}
                       </button>
                     ))}
                   </div>
