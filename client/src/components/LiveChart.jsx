@@ -1,68 +1,50 @@
-import { useState, useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 /**
- * LiveChart — crypto-style animated area/line chart
+ * LiveChart — static snapshot chart (crypto-style area line)
+ * No random animation. Shows real data or a flat placeholder.
  * Props:
- *   data      : [{ label, value }]   — array of data points
- *   color     : 'purple' | 'green'
- *   title     : string
- *   valuePrefix: string (e.g. '₦')
- *   animated  : bool  — if true, streams fake "live" ticks
- *   height    : number (default 180)
+ *   data        : [{ label, value }]  — real data points
+ *   color       : 'purple' | 'green'
+ *   title       : string
+ *   valuePrefix : string (e.g. '₦')
+ *   height      : number (default 160)
+ *   isLive      : bool — shows the LIVE badge (still static visually; badge means data is up-to-date)
  */
 export default function LiveChart({
   data = [],
   color = 'purple',
   title = 'Chart',
   valuePrefix = '',
-  animated = false,
-  height = 180,
+  height = 160,
+  isLive = false,
 }) {
-  const [points, setPoints] = useState(data.length ? data : generateEmpty());
-  const [hovered, setHovered] = useState(null);
-  const tickRef = useRef(null);
   const svgRef = useRef(null);
 
-  function generateEmpty() {
-    return Array.from({ length: 20 }, (_, i) => ({
-      label: `T-${20 - i}`,
-      value: 30 + Math.sin(i * 0.7) * 15 + Math.random() * 10,
-    }));
-  }
+  // Placeholder flat line when no real data
+  const points = data.length >= 2
+    ? data
+    : Array.from({ length: 16 }, (_, i) => ({
+        label: `Day ${i + 1}`,
+        value: 0,
+      }));
 
-  // If animated mode — simulate live ticks
-  useEffect(() => {
-    if (!animated) return;
-    tickRef.current = setInterval(() => {
-      setPoints(prev => {
-        const last = prev[prev.length - 1].value;
-        const next = Math.max(0, last + (Math.random() - 0.45) * (last * 0.08));
-        const now = new Date();
-        const label = `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
-        return [...prev.slice(-29), { label, value: next }];
-      });
-    }, 1800);
-    return () => clearInterval(tickRef.current);
-  }, [animated]);
-
-  // If real data provided — use it
-  useEffect(() => {
-    if (data.length) setPoints(data);
-  }, [data]);
-
-  const vals = points.map(p => p.value);
-  const minV = Math.min(...vals);
-  const maxV = Math.max(...vals);
+  const vals  = points.map(p => p.value);
+  const minV  = Math.min(...vals);
+  const maxV  = Math.max(...vals);
   const range = maxV - minV || 1;
 
   const W = 600;
   const H = height;
-  const PAD = { top: 14, right: 10, bottom: 24, left: 44 };
+  const PAD = { top: 12, right: 8, bottom: 22, left: 40 };
   const chartW = W - PAD.left - PAD.right;
   const chartH = H - PAD.top - PAD.bottom;
 
   const toX = (i) => PAD.left + (i / (points.length - 1)) * chartW;
-  const toY = (v) => PAD.top + chartH - ((v - minV) / range) * chartH;
+  const toY = (v) => {
+    if (maxV === 0) return PAD.top + chartH * 0.7; // flat middle when all zero
+    return PAD.top + chartH - ((v - minV) / range) * chartH;
+  };
 
   const linePath = points.map((p, i) =>
     `${i === 0 ? 'M' : 'L'} ${toX(i).toFixed(1)} ${toY(p.value).toFixed(1)}`
@@ -70,131 +52,113 @@ export default function LiveChart({
 
   const areaPath = `${linePath} L ${toX(points.length - 1).toFixed(1)} ${(PAD.top + chartH).toFixed(1)} L ${PAD.left.toFixed(1)} ${(PAD.top + chartH).toFixed(1)} Z`;
 
-  const colorVar   = color === 'green' ? 'var(--green)' : 'var(--purple-lt)';
-  const gradientId = `grad-${color}-${title.replace(/\s/g,'')}`;
+  const colorHex   = color === 'green' ? '#34D399' : '#9D5FF5';
+  const gradientId = `grad-${color}-${title.replace(/\W/g, '')}`;
 
-  const lastVal = points[points.length - 1]?.value ?? 0;
-  const firstVal = points[0]?.value ?? 0;
-  const isUp = lastVal >= firstVal;
-  const changeVal = Math.abs(lastVal - firstVal);
-  const changePct = firstVal ? ((changeVal / firstVal) * 100).toFixed(2) : '0.00';
+  const lastVal  = vals[vals.length - 1] ?? 0;
+  const firstVal = vals[0] ?? 0;
+  const isUp     = lastVal >= firstVal;
+  const changePct = firstVal > 0
+    ? ((Math.abs(lastVal - firstVal) / firstVal) * 100).toFixed(1)
+    : '0.0';
 
-  // Y-axis ticks
-  const yTicks = 4;
-  const yTickVals = Array.from({ length: yTicks + 1 }, (_, i) =>
-    minV + (range / yTicks) * i
-  );
+  const isEmpty = maxV === 0;
 
-  function handleMouseMove(e) {
-    const svgRect = svgRef.current?.getBoundingClientRect();
-    if (!svgRect) return;
-    const mouseX = (e.clientX - svgRect.left) / svgRect.width * W;
-    let closest = 0;
-    let closestDist = Infinity;
-    points.forEach((_, i) => {
-      const d = Math.abs(toX(i) - mouseX);
-      if (d < closestDist) { closestDist = d; closest = i; }
-    });
-    setHovered(closest);
-  }
+  // Y-axis labels (3 ticks)
+  const yTicks = [maxV, (maxV + minV) / 2, minV].filter((_, i, a) => {
+    // deduplicate when all same
+    return a.indexOf(_) === i;
+  });
 
   return (
-    <div className="live-chart-wrap">
-      <div className="live-chart-header">
-        <div>
-          <div className="live-chart-title">{title}</div>
-          {animated && (
-            <div className="live-chart-live-badge">
-              <span className="live-dot" />
+    <div className="lc-wrap">
+      <div className="lc-header">
+        <div className="lc-left">
+          <span className="lc-title">{title}</span>
+          {isLive && (
+            <span className="lc-live">
+              <span className="lc-dot" />
               LIVE
-            </div>
+            </span>
           )}
         </div>
-        <div className="live-chart-current">
-          <span className="live-chart-value">{valuePrefix}{Number(lastVal.toFixed(2)).toLocaleString()}</span>
-          <span className={`live-chart-change ${isUp ? 'up' : 'down'}`}>
-            {isUp ? '▲' : '▼'} {changePct}%
-          </span>
+        <div className="lc-right">
+          <span className="lc-value">{valuePrefix}{Number(lastVal.toFixed(2)).toLocaleString()}</span>
+          {!isEmpty && (
+            <span className={`lc-change ${isUp ? 'up' : 'down'}`}>
+              {isUp ? '▲' : '▼'} {changePct}%
+            </span>
+          )}
         </div>
       </div>
 
-      <div
-        className="live-chart-svg-wrap"
-        onMouseMove={handleMouseMove}
-        onMouseLeave={() => setHovered(null)}
-      >
+      <div className="lc-svg-wrap" ref={svgRef}>
         <svg
-          ref={svgRef}
           viewBox={`0 0 ${W} ${H}`}
           preserveAspectRatio="none"
           style={{ width: '100%', height: `${height}px`, display: 'block' }}
         >
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={colorVar} stopOpacity="0.22" />
-              <stop offset="100%" stopColor={colorVar} stopOpacity="0.01" />
+              <stop offset="0%"   stopColor={colorHex} stopOpacity={isEmpty ? '0.04' : '0.18'} />
+              <stop offset="100%" stopColor={colorHex} stopOpacity="0.01" />
             </linearGradient>
-            <filter id="glow">
-              <feGaussianBlur stdDeviation="2.5" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            <filter id={`glow-${color}`}>
+              <feGaussianBlur stdDeviation="2" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
             </filter>
           </defs>
 
-          {/* Y-axis grid lines + labels */}
-          {yTickVals.map((v, i) => {
+          {/* Grid lines */}
+          {yTicks.map((v, i) => {
             const y = toY(v);
             return (
               <g key={i}>
-                <line
-                  x1={PAD.left} y1={y} x2={W - PAD.right} y2={y}
-                  stroke="var(--border)" strokeWidth="0.7" strokeDasharray="3 4"
-                />
-                <text x={PAD.left - 6} y={y + 4} textAnchor="end"
-                  fontSize="10" fill="var(--text-dim)">
-                  {valuePrefix}{v >= 1000 ? `${(v/1000).toFixed(0)}k` : v.toFixed(0)}
-                </text>
+                <line x1={PAD.left} y1={y} x2={W - PAD.right} y2={y}
+                  stroke="#ffffff18" strokeWidth="0.6" strokeDasharray="3 5" />
+                {!isEmpty && (
+                  <text x={PAD.left - 5} y={y + 4} textAnchor="end"
+                    fontSize="9" fill="#6B6B8A">
+                    {valuePrefix}{v >= 1000 ? `${(v / 1000).toFixed(0)}k` : Math.round(v)}
+                  </text>
+                )}
               </g>
             );
           })}
 
-          {/* Area fill */}
+          {/* Area */}
           <path d={areaPath} fill={`url(#${gradientId})`} />
 
           {/* Line */}
           <path
             d={linePath}
             fill="none"
-            stroke={colorVar}
-            strokeWidth="1.8"
+            stroke={colorHex}
+            strokeWidth={isEmpty ? '1' : '1.8'}
             strokeLinecap="round"
             strokeLinejoin="round"
-            filter="url(#glow)"
+            strokeOpacity={isEmpty ? '0.3' : '1'}
+            filter={isEmpty ? undefined : `url(#glow-${color})`}
           />
 
-          {/* Hover crosshair */}
-          {hovered !== null && (
-            <g>
-              <line
-                x1={toX(hovered)} y1={PAD.top}
-                x2={toX(hovered)} y2={PAD.top + chartH}
-                stroke="var(--border-light)" strokeWidth="1" strokeDasharray="3 3"
-              />
-              <circle
-                cx={toX(hovered)} cy={toY(points[hovered].value)}
-                r="4" fill={colorVar} stroke="var(--bg2)" strokeWidth="2"
-              />
-              {/* Tooltip */}
-              <g transform={`translate(${Math.min(toX(hovered) + 8, W - 100)}, ${Math.max(toY(points[hovered].value) - 28, PAD.top)})`}>
-                <rect rx="5" ry="5" width="88" height="32"
-                  fill="var(--bg3)" stroke="var(--border-light)" strokeWidth="1" />
-                <text x="44" y="13" textAnchor="middle" fontSize="10" fill="var(--text-muted)">
-                  {points[hovered].label}
-                </text>
-                <text x="44" y="26" textAnchor="middle" fontSize="11" fontWeight="600" fill="var(--text)">
-                  {valuePrefix}{Number(points[hovered].value.toFixed(2)).toLocaleString()}
-                </text>
-              </g>
-            </g>
+          {/* Last point dot */}
+          {!isEmpty && (
+            <circle
+              cx={toX(points.length - 1)}
+              cy={toY(lastVal)}
+              r="3.5"
+              fill={colorHex}
+              stroke="#0E0E1A"
+              strokeWidth="2"
+            />
+          )}
+
+          {/* Empty state text */}
+          {isEmpty && (
+            <text x={W / 2} y={H / 2 + 4} textAnchor="middle"
+              fontSize="12" fill="#3D3D55">
+              No data yet
+            </text>
           )}
         </svg>
       </div>

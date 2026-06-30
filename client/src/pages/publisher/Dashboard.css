@@ -1,0 +1,122 @@
+/* ── ACTION LIST ── */
+.action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.action-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 10px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  text-decoration: none;
+  color: var(--text);
+  transition: background 0.12s, border-color 0.12s;
+  cursor: pointer;
+}
+.action-item:hover {
+  background: var(--bg3);
+  border-color: var(--border);
+}
+.action-item--primary {
+  background: var(--purple-dim);
+  border-color: var(--purple-border);
+}
+.action-item--primary:hover {
+  background: var(--purple-dim);
+  border-color: var(--purple);
+}
+.action-item--alert {
+  border-color: var(--border);
+}
+.action-item--alert:hover {
+  background: #FBBF2408;
+  border-color: #FBBF2430;
+}
+
+.action-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.action-item--primary .action-icon {
+  background: var(--purple-dim);
+  border-color: var(--purple-border);
+}
+
+.action-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.action-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1;
+}
+.action-item--primary .action-label { color: var(--purple-lt); }
+.action-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+.action-arrow {
+  width: 16px; height: 16px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+.action-item:hover .action-arrow { color: var(--text-muted); }
+
+.action-badge {
+  background: #FBBF2420;
+  color: var(--yellow);
+  border: 1px solid #FBBF2440;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  flex-shrink: 0;
+}
+
+/* ── SUMMARY LIST ── */
+.summary-list {
+  display: flex;
+  flex-direction: column;
+}
+.summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+.summary-row:last-child { border-bottom: none; padding-bottom: 0; }
+.summary-row:first-child { padding-top: 0; }
+.summary-label {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 400;
+  text-transform: capitalize;
+}
+.summary-val {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}

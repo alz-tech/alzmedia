@@ -1,13 +1,11 @@
-/* ══════════════════════════════════════
-   NAVBAR — Fixed top bar + bottom tab bar
-   ══════════════════════════════════════ */
+/* ══════════════════════════════════
+   NAVBAR
+   ══════════════════════════════════ */
 
 :root {
-  --nav-height:    56px;
-  --tab-bar-height: 60px;
+  --nav-height: 56px;
 }
 
-/* ── TOP BAR ─────────────────────────────────────────────── */
 .navbar {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -20,9 +18,9 @@
 
 .navbar-inner {
   height: 100%;
-  max-width: 540px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -76,7 +74,7 @@
   flex-shrink: 0;
 }
 
-/* Hamburger (shown for profile/overflow menu) */
+/* Hamburger */
 .navbar-hamburger {
   width: 34px; height: 34px;
   border-radius: var(--radius);
@@ -103,7 +101,7 @@
 .navbar-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
 .navbar-hamburger.open span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); background: var(--text); }
 
-/* ── SLIDE-DOWN PROFILE MENU ─────────────────────────────── */
+/* ── SLIDE-DOWN MENU ── */
 .navbar-menu {
   position: fixed;
   top: var(--nav-height);
@@ -122,9 +120,10 @@
 .navbar-menu-inner {
   background: var(--bg2);
   border-bottom: 1px solid var(--border);
-  padding: 16px 16px 20px;
-  max-width: 540px;
-  margin: 0 auto;
+  padding: 16px 20px 24px;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: 20px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -134,6 +133,8 @@
   transition: transform 0.28s cubic-bezier(.22,1,.36,1), opacity 0.2s ease;
   max-height: calc(100vh - var(--nav-height));
   overflow-y: auto;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  box-shadow: 0 12px 40px #00000030;
 }
 .navbar-menu.open .navbar-menu-inner {
   transform: translateY(0);
@@ -181,21 +182,20 @@
   border-color: var(--purple-border);
 }
 
-/* Nav links (inside slide menu — shown on ALL screen sizes as overflow) */
+/* Nav links */
 .navbar-links {
   display: flex;
   flex-direction: column;
   gap: 2px;
   padding-bottom: 10px;
 }
-
 .navbar-link {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 11px 12px;
   border-radius: var(--radius);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text-muted);
   transition: background 0.12s, color 0.12s;
@@ -208,7 +208,7 @@
   border-color: var(--purple-border);
 }
 .navbar-link-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.navbar-link-icon svg { width: 18px; height: 18px; }
+.navbar-link-icon svg { width: 17px; height: 17px; }
 
 /* Menu footer */
 .navbar-menu-footer {
@@ -257,13 +257,13 @@
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 .navbar-logout:hover { background: #F8717110; color: var(--red); border-color: #F8717122; }
-.navbar-logout svg  { width: 18px; height: 18px; flex-shrink: 0; }
+.navbar-logout svg  { width: 17px; height: 17px; flex-shrink: 0; }
 
 /* Close button */
 .navbar-close-btn {
   position: absolute;
   top: 14px; right: 14px;
-  width: 32px; height: 32px;
+  width: 30px; height: 30px;
   border-radius: var(--radius);
   background: var(--bg3);
   border: 1px solid var(--border);
@@ -273,71 +273,16 @@
   justify-content: center;
 }
 .navbar-close-btn:hover { color: var(--text); }
-.navbar-close-btn svg { width: 15px; height: 15px; }
+.navbar-close-btn svg { width: 14px; height: 14px; }
 
 /* Backdrop */
 .navbar-backdrop {
   position: fixed;
   inset: 0;
   top: var(--nav-height);
-  background: #00000060;
+  background: #00000055;
   z-index: 198;
   backdrop-filter: blur(2px);
   animation: bFadeIn 0.15s ease;
 }
 @keyframes bFadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-/* ══════════════════════════════════════
-   BOTTOM TAB BAR (mobile app feel)
-   ══════════════════════════════════════ */
-.tab-bar {
-  display: none; /* shown on mobile below */
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  height: var(--tab-bar-height);
-  background: var(--bg2);
-  border-top: 1px solid var(--border);
-  z-index: 200;
-  padding: 0 4px;
-  padding-bottom: env(safe-area-inset-bottom, 0);
-}
-.tab-bar-inner {
-  height: 100%;
-  max-width: 540px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-}
-.tab-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  flex: 1;
-  padding: 6px 4px;
-  border-radius: var(--radius);
-  color: var(--text-dim);
-  font-size: 10px;
-  font-weight: 500;
-  font-family: var(--font-display);
-  border: none;
-  background: none;
-  transition: color 0.15s;
-  cursor: pointer;
-  text-decoration: none;
-  white-space: nowrap;
-}
-.tab-item svg { width: 20px; height: 20px; }
-.tab-item.active { color: var(--purple-lt); }
-.tab-item:not(.active):hover { color: var(--text-muted); }
-
-/* Pill indicator on active tab icon */
-.tab-item.active svg {
-  filter: drop-shadow(0 0 4px var(--purple-lt));
-}
-
-@media (max-width: 768px) {
-  .tab-bar { display: flex; }
-}
