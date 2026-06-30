@@ -266,67 +266,57 @@ img { max-width: 100%; display: block; }
 }
 
 /* ── LIVE CHART ── */
-.live-chart-wrap {
-  width: 100%;
-}
-.live-chart-header {
+.lc-wrap { width: 100%; }
+.lc-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 14px;
-  gap: 12px;
+  margin-bottom: 12px;
+  gap: 10px;
 }
-.live-chart-title {
-  font-size: 13px;
-  font-weight: 500;
+.lc-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.lc-title {
+  font-size: 12px;
+  font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  margin-bottom: 4px;
 }
-.live-chart-live-badge {
+.lc-live {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-size: 10px;
+  gap: 4px;
+  font-size: 9px;
   font-weight: 700;
   letter-spacing: 1px;
   color: var(--green);
   background: var(--green-dim);
   border: 1px solid var(--green-border);
   border-radius: 20px;
-  padding: 2px 8px;
+  padding: 2px 7px;
 }
-.live-dot {
-  width: 6px; height: 6px;
+.lc-dot {
+  width: 5px; height: 5px;
   border-radius: 50%;
   background: var(--green);
-  animation: pulse 1.4s ease infinite;
+  animation: lcPulse 1.6s ease infinite;
 }
-@keyframes pulse {
-  0%,100% { opacity: 1; transform: scale(1); }
-  50%      { opacity: 0.5; transform: scale(0.7); }
+@keyframes lcPulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.4; }
 }
-.live-chart-current {
-  text-align: right;
-}
-.live-chart-value {
+.lc-right { text-align: right; flex-shrink: 0; }
+.lc-value {
   display: block;
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
-  letter-spacing: -0.8px;
+  letter-spacing: -0.6px;
   color: var(--text);
   line-height: 1;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
-.live-chart-change {
-  font-size: 12px;
-  font-weight: 500;
-}
-.live-chart-change.up   { color: var(--green); }
-.live-chart-change.down { color: var(--red); }
-.live-chart-svg-wrap {
-  cursor: crosshair;
-  user-select: none;
-}
+.lc-change { font-size: 11px; font-weight: 500; }
+.lc-change.up   { color: var(--green); }
+.lc-change.down { color: var(--red); }
+.lc-svg-wrap { width: 100%; }

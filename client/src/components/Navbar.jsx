@@ -108,10 +108,6 @@ export default function Navbar() {
   const effectiveRole = user?.role === 'admin' ? adminView : user?.role;
   const links = (user?.role === 'admin' ? ADMIN_VIEWS[adminView].links : NAV[user?.role]) || [];
 
-  // Bottom tab bar shows primary 4–5 links (the rest go in the slide menu)
-  const TAB_LIMIT = 4;
-  const tabLinks   = links.slice(0, TAB_LIMIT);
-
   return (
     <>
       <nav className="navbar" ref={menuRef}>
@@ -208,32 +204,6 @@ export default function Navbar() {
 
       {/* Backdrop */}
       {open && <div className="navbar-backdrop" onClick={() => setOpen(false)} />}
-
-      {/* ── BOTTOM TAB BAR (mobile) ── */}
-      {user && (
-        <div className="tab-bar">
-          <div className="tab-bar-inner">
-            {tabLinks.map(({ to, label, icon, end }) => (
-              <NavLink key={to} to={to} end={end}
-                className={({ isActive }) => `tab-item${isActive ? ' active' : ''}`}>
-                {ICONS[icon]}
-                <span>{label}</span>
-              </NavLink>
-            ))}
-            {/* More button to open the slide menu if there are extra links */}
-            {links.length > TAB_LIMIT && (
-              <button className={`tab-item${open ? ' active' : ''}`} onClick={() => setOpen(o => !o)}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
-                  <circle cx="12" cy="5"  r="1.2" fill="currentColor"/>
-                  <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
-                  <circle cx="12" cy="19" r="1.2" fill="currentColor"/>
-                </svg>
-                <span>More</span>
-              </button>
-            )}
-          </div>
-        </div>
-      )}
     </>
   );
 }
