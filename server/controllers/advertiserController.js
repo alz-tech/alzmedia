@@ -18,7 +18,6 @@ exports.getStats = async (req, res) => {
     wallet_balance: 0, total_spent: 0, campaign_count: 0,
     active_campaigns: 0, total_funded: 0,
   });
-  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform advertiser actions', 403);
   const adv = await getAdvertiser(req.user.id);
   if (!adv) return error(res, 'Advertiser profile not found', 404);
   const stats = await Advertiser.stats(adv.id);
@@ -29,7 +28,6 @@ exports.getStats = async (req, res) => {
 exports.fundWallet = async (req, res) => {
   if (!Paystack.isConfigured())
     return error(res, 'Wallet funding is temporarily unavailable. Payment system not yet configured.', 503);
-  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform advertiser actions', 403);
   const adv = await getAdvertiser(req.user.id);
   if (!adv) return error(res, 'Advertiser profile not found', 404);
 
@@ -61,7 +59,6 @@ exports.getTransactions = async (req, res) => {
 
 // ── CAMPAIGNS ─────────────────────────────────────────────────
 exports.getCampaigns = async (req, res) => {
-  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform advertiser actions', 403);
   const adv = await getAdvertiser(req.user.id);
   if (!adv) return error(res, 'Advertiser profile not found', 404);
   const campaigns = await Campaign.byAdvertiser(adv.id);
@@ -69,7 +66,6 @@ exports.getCampaigns = async (req, res) => {
 };
 
 exports.createCampaign = async (req, res) => {
-  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform advertiser actions', 403);
   const adv = await getAdvertiser(req.user.id);
   if (!adv) return error(res, 'Advertiser profile not found', 404);
 
@@ -93,7 +89,6 @@ exports.createCampaign = async (req, res) => {
 };
 
 exports.updateCampaignStatus = async (req, res) => {
-  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform advertiser actions', 403);
   const adv = await getAdvertiser(req.user.id);
   if (!adv) return error(res, 'Advertiser profile not found', 404);
 
@@ -109,7 +104,6 @@ exports.updateCampaignStatus = async (req, res) => {
 };
 
 exports.getCampaignAnalytics = async (req, res) => {
-  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform advertiser actions', 403);
   const adv = await getAdvertiser(req.user.id);
   if (!adv) return error(res, 'Advertiser profile not found', 404);
 
@@ -142,7 +136,6 @@ exports.getCampaignAnalytics = async (req, res) => {
 
 // ── CREATIVES ─────────────────────────────────────────────────
 exports.uploadCreative = async (req, res) => {
-  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform advertiser actions', 403);
   const adv = await getAdvertiser(req.user.id);
   if (!adv) return error(res, 'Advertiser profile not found', 404);
 
@@ -170,7 +163,6 @@ exports.uploadCreative = async (req, res) => {
 };
 
 exports.getCreatives = async (req, res) => {
-  if (req.user.role === 'admin') return error(res, 'Admin accounts cannot perform advertiser actions', 403);
   const adv = await getAdvertiser(req.user.id);
   if (!adv) return error(res, 'Advertiser profile not found', 404);
 

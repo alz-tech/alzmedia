@@ -96,8 +96,8 @@
   transition: border-color 0.2s, transform 0.15s, background 0.2s;
 }
 .gs-card:hover { transform: translateY(-2px); border-color: var(--border-light); }
-.gs-card.adv.selected { border-color: var(--purple); background: #15102B; box-shadow: 0 0 0 3px var(--purple-dim); }
-.gs-card.pub.selected { border-color: var(--green);  background: #0D1A15; box-shadow: 0 0 0 3px var(--green-dim); }
+.gs-card.adv.selected { border-color: var(--purple); background: var(--purple-dim); box-shadow: 0 0 0 3px var(--purple-dim); }
+.gs-card.pub.selected { border-color: var(--green);  background: var(--green-dim);  box-shadow: 0 0 0 3px var(--green-dim); }
 
 .gs-card-check {
   position: absolute; top: 12px; right: 12px;
