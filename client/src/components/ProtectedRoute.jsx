@@ -12,7 +12,7 @@ export default function ProtectedRoute({ children, role }) {
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '100vh',
-        background: '#07070D',
+        background: 'var(--bg, #F8F9FC)',
         flexDirection: 'column',
         gap: 16,
       }}>
@@ -22,14 +22,14 @@ export default function ProtectedRoute({ children, role }) {
           fontWeight: 700,
           letterSpacing: -1,
         }}>
-          <span style={{ color: '#9D5FF5' }}>Alz</span>
-          <span style={{ color: '#F4F4FF' }}>Media</span>
+          <span style={{ color: 'var(--purple-lt, #9D5FF5)' }}>Alz</span>
+          <span style={{ color: 'var(--text, #0D0D1A)' }}>Media</span>
         </div>
         <div style={{
           width: 24,
           height: 24,
-          border: '2px solid #1E1E30',
-          borderTopColor: '#7C3AED',
+          border: '2px solid var(--border, #E2E4EE)',
+          borderTopColor: 'var(--purple, #7C3AED)',
           borderRadius: '50%',
           animation: 'spin 0.7s linear infinite',
         }} />
